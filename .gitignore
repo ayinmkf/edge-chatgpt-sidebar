@@ -1,0 +1,10 @@
+# Edge 加载解压扩展后会在这里生成 DNR 规则缓存，可以安全删除
+_metadata/
+
+# 自检产物
+panel-shot.png
+tools/last-verify.log
+dist/
+backups/
+artifacts/
+_snapshots/

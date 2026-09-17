@@ -1,0 +1,14 @@
+[
+  {
+    "id": 3,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [{ "header": "referer", "operation": "remove" }]
+    },
+    "condition": {
+      "urlFilter": "||chatgpt.com^",
+      "resourceTypes": ["sub_frame"]
+    }
+  }
+]

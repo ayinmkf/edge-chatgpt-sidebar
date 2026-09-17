@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ChatGPT 侧边栏</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <header class="toolbar">
+    <div class="brand" title="ChatGPT 侧边栏">
+      <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="2" y="3" width="20" height="15" rx="4"></rect>
+        <path d="M7 18v4l5-4z"></path>
+      </svg>
+      <span class="brand-name">ChatGPT 侧边栏</span>
+    </div>
+
+    <div class="actions">
+      <button id="btn-reload" class="icon-btn" type="button" title="重新加载 ChatGPT" aria-label="重新加载 ChatGPT">
+        <svg class="stroke" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"></path><path d="M20.5 3.5V9H15"></path></svg>
+      </button>
+      <button id="btn-tab" class="icon-btn" type="button" title="在标签页中打开 ChatGPT" aria-label="在标签页中打开 ChatGPT">
+        <svg class="stroke" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 4.5H19.5V10.5"></path><path d="M19.5 4.5 11 13"></path><path d="M18 14.5v4a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6h4"></path></svg>
+      </button>
+      <button id="btn-compat" class="icon-btn" type="button" aria-pressed="false" title="兼容模式：把 ChatGPT 放进一个贴边独立窗口（面板内嵌入失败时使用）" aria-label="兼容模式">
+        <svg class="stroke" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="2"></rect><path d="M14.5 4.5v15"></path></svg>
+      </button>
+      <button id="btn-stealth" class="icon-btn" type="button" aria-pressed="false" title="临时隐身：不携带登录信息加载 ChatGPT（不影响其他标签页）" aria-label="临时隐身">
+        <svg class="stroke" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12s3.6-6 9-6 9 6 9 6-3.6 6-9 6-9-6-9-6z"></path><circle cx="12" cy="12" r="2.6"></circle><path d="M4 3.6 20.4 20"></path></svg>
+      </button>
+      <button id="btn-menu" class="icon-btn" type="button" aria-haspopup="true" aria-expanded="false" title="更多设置" aria-label="更多设置">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle></svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="menu" class="menu" role="menu" hidden>
+    <button class="menu-item" id="btn-stable" role="menuitem" type="button">返回稳定投递侧栏（关闭实验规则）</button>
+    <label class="menu-item" role="menuitemcheckbox">
+      <input type="checkbox" id="opt-autosend">
+      <span>选中文字后自动发送</span>
+    </label>
+    <label class="menu-item" role="menuitemcheckbox">
+      <input type="checkbox" id="opt-fab">
+      <span>网页选中文字时显示悬浮按钮</span>
+    </label>
+    <label class="menu-item" role="menuitemcheckbox">
+      <input type="checkbox" id="opt-hidetoolbar">
+      <span>紧凑模式（隐藏状态条）</span>
+    </label>
+    <div class="menu-sep"></div>
+    <button class="menu-item danger" id="btn-logout" role="menuitem" type="button">
+      <svg class="stroke" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H5v16h5"></path><path d="M15 8.5 18.5 12 15 15.5"></path><path d="M9 12h9.5"></path></svg>
+      <span>退出登录 ChatGPT（清除 Cookie）</span>
+    </button>
+    <div class="menu-sep"></div>
+    <label class="menu-item" role="menuitemcheckbox">
+      <input type="checkbox" id="opt-legacywrite">
+      <span>兼容写入模式（文字送不进去时勾上）</span>
+    </label>
+    <div class="menu-sep"></div>
+    <label class="menu-item" role="menuitemcheckbox">
+      <input type="checkbox" id="opt-uaspoof">
+      <span>伪装 User-Agent（面板内一直卡在人机验证时试试）</span>
+    </label>
+    <button class="menu-item" id="btn-probe" role="menuitem" type="button">自检：嵌入规则是否生效</button>
+    <button class="menu-item" id="btn-diag" role="menuitem" type="button">诊断：输入框结构（发送失败时用）</button>
+    <button class="menu-item" id="btn-shortcut" role="menuitem" type="button">设置快捷键</button>
+    <div class="menu-version" id="menu-version"></div>
+  </div>
+
+  <main class="stage">
+    <iframe
+      id="frame"
+      title="ChatGPT"
+      src="about:blank"
+      referrerpolicy="no-referrer"
+      allow="clipboard-read; clipboard-write; microphone; camera"
+      allowtransparency="true"></iframe>
+
+    <div id="loading" class="overlay">
+      <div class="overlay-card">
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="overlay-title">正在加载 ChatGPT…</p>
+        <p class="overlay-hint">首次打开若出现人机验证，请在标签页中完成一次验证。</p>
+        <div class="overlay-actions">
+          <button class="btn" id="btn-slow-compat" type="button">兼容模式</button>
+          <button class="btn" id="btn-slow-tab" type="button">在标签页中打开</button>
+          <button class="btn" id="btn-slow-retry" type="button">重试</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="compat-hint" class="compat-strip" hidden>
+    <span>兼容模式已开启：ChatGPT 在独立贴边窗口中</span>
+    <button class="btn small" id="btn-compat-back" type="button">回到嵌入式面板</button>
+  </div>
+
+  <footer class="statusbar" id="statusbar" role="status" aria-live="polite">
+    <span class="dot" id="status-dot"></span>
+    <span id="status-text">就绪</span>
+  </footer>
+
+  <div id="confirm" class="overlay" hidden>
+    <div class="overlay-card">
+      <p class="overlay-title">退出登录 ChatGPT？</p>
+      <p class="overlay-hint">
+        这会删除本机 Edge 配置中 chatgpt.com / openai.com 的 Cookie，
+        <strong>你在普通标签页里的 ChatGPT 也会变成未登录</strong>。此操作不可撤销。
+      </p>
+      <div class="overlay-actions">
+        <button class="btn" id="btn-cancel-logout" type="button">取消</button>
+        <button class="btn danger" id="btn-confirm-logout" type="button">确认退出</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="panel.js"></script>
+</body>
+</html>

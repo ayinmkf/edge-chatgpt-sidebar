@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ChatGPT 投递侧栏</title>
+    <link rel="stylesheet" href="stable.css">
+  </head>
+  <body>
+    <main class="panel">
+      <header>
+        <div><h1>ChatGPT 投递</h1><p>将网页选中文本发送到顶层 ChatGPT 标签页</p></div>
+        <button id="btn-open" class="icon" title="打开 ChatGPT 标签页" aria-label="打开 ChatGPT 标签页">↗</button>
+      </header>
+      <section class="card" aria-live="polite">
+        <span id="status-dot" class="dot queued"></span>
+        <div><strong id="status">等待选中文本</strong><p id="status-detail">在任意网页选中文字后点击“问 ChatGPT”。</p></div>
+      </section>
+      <section class="card prompt-card">
+        <label for="job-list">本窗口投递记录</label>
+        <select id="job-list" aria-label="选择投递记录"></select>
+        <label for="prompt-preview">当前投递内容</label>
+        <textarea id="prompt-preview" readonly placeholder="尚无待投递内容"></textarea>
+        <p id="meta" class="muted"></p>
+      </section>
+      <section class="actions" aria-label="投递操作"><button id="btn-retry" type="button">重试投递</button><button id="btn-copy" type="button" class="secondary">复制文本</button></section>
+      <label class="switch" for="auto-send"><input id="auto-send" type="checkbox" checked><span>写入后自动发送</span></label>
+      <p class="muted">关闭后只填入 ChatGPT 输入框，方便你手动确认。</p>
+      <label class="switch"><input id="show-fab" type="checkbox" checked><span>选中文本时显示“问 ChatGPT”</span></label>
+      <details class="advanced"><summary>任务诊断</summary><pre id="diagnostic">暂无任务</pre></details>
+      <details class="advanced">
+        <summary>高级 / 实验性功能</summary>
+        <p>默认模式不会修改 ChatGPT 响应头，也不会嵌入 ChatGPT。以下功能可能受网站限制。</p>
+        <label class="switch" for="experimental-mode"><input id="experimental-mode" type="checkbox"><span>切换到内嵌侧栏（实验性）</span></label>
+        <button id="btn-compat" type="button" class="secondary">打开独立贴边窗口</button>
+      </details>
+      <p class="muted" id="version"></p>
+    </main>
+    <script src="stable.js"></script>
+  </body>
+</html>

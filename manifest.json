@@ -1,0 +1,98 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPT 侧边栏",
+  "version": "0.3.1",
+  "description": "选中文本后打开 Edge 侧栏，可靠投递到已登录的 ChatGPT 标签页。支持自动发送、仅填入和实验性内嵌模式。",
+  "minimum_chrome_version": "116",
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "action": {
+    "default_title": "打开 / 关闭 ChatGPT 侧边栏",
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png",
+      "48": "icons/48.png",
+      "128": "icons/128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "panel/stable.html"
+  },
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "alarms",
+    "scripting",
+    "declarativeNetRequestWithHostAccess",
+    "declarativeNetRequestFeedback",
+    "contextMenus",
+    "tabs",
+    "browsingData"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://*.chatgpt.com/*",
+    "https://*.openai.com/*",
+    "<all_urls>"
+  ],
+  "commands": {
+    "toggle-panel": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "打开 / 关闭 ChatGPT 侧边栏"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://*.chatgpt.com/*",
+        "https://*.openai.com/*"
+      ],
+      "js": [
+        "content/chatgpt-bridge.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "exclude_matches": [
+        "https://chatgpt.com/*",
+        "https://*.chatgpt.com/*",
+        "https://*.openai.com/*"
+      ],
+      "js": [
+        "content/selection.js"
+      ],
+      "all_frames": false,
+      "run_at": "document_idle"
+    }
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "headers",
+        "enabled": false,
+        "path": "rules/headers.json"
+      },
+      {
+        "id": "site",
+        "enabled": false,
+        "path": "rules/site.json"
+      }
+    ]
+  }
+}
