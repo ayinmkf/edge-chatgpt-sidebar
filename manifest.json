@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "ChatGPT 侧边栏",
-  "version": "0.3.1",
-  "description": "选中文本后打开 Edge 侧栏，可靠投递到已登录的 ChatGPT 标签页。支持自动发送、仅填入和实验性内嵌模式。",
+  "version": "0.3.2",
+  "description": "默认在 Edge 侧栏内使用 ChatGPT，支持选区发送和仅填入；顶部设置可开关功能，高级选项提供稳定标签页投递。",
   "minimum_chrome_version": "116",
   "icons": {
     "16": "icons/16.png",
@@ -20,7 +20,7 @@
     }
   },
   "side_panel": {
-    "default_path": "panel/stable.html"
+    "default_path": "panel/panel.html"
   },
   "background": {
     "service_worker": "background/service-worker.js"

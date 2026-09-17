@@ -47,10 +47,39 @@ try {
   const sw = (code) => edge.evaluate(edge.worker.sessionId, code);
   const version = await sw('chrome.runtime.getManifest().version');
   const state = () => sw('chrome.storage.session.get("deliveryQueueV1").then(d=>d.deliveryQueueV1||[])');
-  await check('真实 MV3 后台启动，稳定入口和默认规则正确', async () => {
-    assert.equal(version, '0.3.1');
+  await check('真实 MV3 后台启动，默认内嵌入口与规则正确', async () => {
+    assert.equal(version, '0.3.2');
+    await until(async () => (await sw('chrome.sidePanel.getOptions({})')).path === 'panel/panel.html');
+    assert.deepEqual((await sw('chrome.declarativeNetRequest.getEnabledRulesets()')).sort(), ['headers','site']);
+  });
+  const embedded = await edge.page('chrome-extension://' + edge.extensionId + '/panel/panel.html');
+  const embeddedUi = (code) => edge.evaluate(embedded.sessionId, code);
+  await until(async () => (await embeddedUi('document.querySelector("#status-text").textContent')).includes('已连接'));
+  await check('内嵌顶部设置包含常用开关和折叠高级选项，设置即时保存', async () => {
+    await embeddedUi('document.querySelector("#btn-menu").click()');
+    assert.equal(await embeddedUi('document.querySelector("#menu").hidden'), false);
+    assert.equal(await embeddedUi('document.querySelector("#advanced-settings").open'), false);
+    await embeddedUi('document.querySelector("#opt-autosend").click();document.querySelector("#opt-fab").click()');
+    await until(async () => (await sw('chrome.storage.sync.get("fab")')).fab === false);
+    assert.equal((await sw('chrome.storage.sync.get("autoSend")')).autoSend,false);
+    const result = await embeddedUi('chrome.runtime.sendMessage({type:"send-to-panel",text:"内嵌仅填入测试"})');
+    assert.equal(result.experimental,true);
+    await until(async () => (await embeddedUi('document.querySelector("#status-text").textContent')).includes('已填入'));
+    await embeddedUi('document.querySelector("#opt-autosend").click();document.querySelector("#opt-fab").click()');
+    await until(async () => (await sw('chrome.storage.sync.get("fab")')).fab === true);
+    await edge.send('Emulation.setDeviceMetricsOverride',{width:320,height:500,deviceScaleFactor:1,mobile:false},embedded.sessionId);
+    assert.equal(await embeddedUi('document.querySelector("#advanced-settings").open=true;document.documentElement.scrollWidth <= innerWidth'),true);
+    if (hasScreenshot) {
+      const shot=await edge.send('Page.captureScreenshot',{format:'png'},embedded.sessionId);
+      writeFileSync(screenshot.replace(/\.png$/i,'-embedded.png'),Buffer.from(shot.data,'base64'));
+    }
+  });
+  await check('从高级选项切换稳定投递，规则关闭；后台初始化保持本会话选择', async () => {
+    await embeddedUi('document.querySelector("#btn-stable").click()');
     await until(async () => (await sw('chrome.sidePanel.getOptions({})')).path === 'panel/stable.html');
     assert.deepEqual(await sw('chrome.declarativeNetRequest.getEnabledRulesets()'), []);
+    await sw('initializeMode()');
+    assert.equal((await sw('chrome.sidePanel.getOptions({})')).path,'panel/stable.html');
   });
   const source = await edge.page('http://127.0.0.1:' + server.address().port + '/');
   const content = (code) => edge.evaluate(source.sessionId, code);
@@ -81,7 +110,7 @@ try {
     await sleep(300);
     await until(async () => (await sw(`chrome.tabs.get(${lastTabId})`)).status === 'complete');
     await until(async () => {
-      try { return await sw(`chrome.tabs.sendMessage(${lastTabId},{type:'delivery-v3-ping'},{frameId:0}).then(r=>r.version==='0.3.1')`); } catch { return false; }
+      try { return await sw(`chrome.tabs.sendMessage(${lastTabId},{type:'delivery-v3-ping'},{frameId:0}).then(r=>r.version==='0.3.2')`); } catch { return false; }
     });
   }
   async function deliver(text, autoSend = true, id = crypto.randomUUID()) {
@@ -122,8 +151,9 @@ try {
     const job=await until(async()=>(await state()).find((item)=>item.id===result.jobId && !['queued','opening-chatgpt','waiting-page','delivering'].includes(item.status)));
     assert.equal(job.status,'sent',JSON.stringify(job));
   });
-  await check('高级模式启用旧侧栏和规则，返回稳定模式后规则关闭', async () => {
-    assert.equal((await runtime({ type:'set-experimental-embedded',enabled:true })).ok,true);
+  await check('返回内嵌按钮恢复侧栏和规则，内嵌与独立窗口发送通过', async () => {
+    await ui('document.querySelector("#btn-embedded").click()');
+    await until(async () => (await sw('chrome.sidePanel.getOptions({})')).path === 'panel/panel.html');
     assert.deepEqual((await sw('chrome.declarativeNetRequest.getEnabledRulesets()')).sort(),['headers','site']);
     assert.equal((await sw('chrome.sidePanel.getOptions({})')).path,'panel/panel.html');
     const legacy=await until(()=>[...edge.sessions.values()].find((item)=>item.type==='page' && item.url.endsWith('/panel/panel.html')));
@@ -144,6 +174,14 @@ try {
     const shot=await edge.send('Page.captureScreenshot',{format:'png'},panel.sessionId);
     writeFileSync(screenshot,Buffer.from(shot.data,'base64'));
   }
+  await check('新会话初始化恢复内嵌，保留用户偏好，不自动重发文本', async () => {
+    await sw('chrome.storage.sync.set({autoSend:false}).then(()=>chrome.storage.session.remove("experimentalEmbedded"))');
+    await sw('initializeMode()');
+    assert.equal((await sw('chrome.sidePanel.getOptions({})')).path,'panel/panel.html');
+    assert.deepEqual((await sw('chrome.declarativeNetRequest.getEnabledRulesets()')).sort(),['headers','site']);
+    assert.equal((await sw('chrome.storage.sync.get("autoSend")')).autoSend,false);
+    assert.equal((await sw('chrome.storage.session.get("pendingPrompt")')).pendingPrompt,undefined);
+  });
   await check('页面与后台没有未处理异常', async () => { assert.deepEqual(edge.errors,[]); });
   console.log('Edge 完整链路：' + passed + ' 项通过');
 } catch (error) {

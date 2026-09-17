@@ -56,7 +56,7 @@ async function refresh() {
   if (!selectedId || selectedId === previousLatest) selectedId = jobs.at(-1)?.id || null;
   $('auto-send').checked = data.autoSend !== false;
   $('show-fab').checked = data.fab !== false;
-  $('experimental-mode').checked = !!data.experimentalEmbedded;
+  if (data.experimentalEmbedded) { location.replace('panel.html'); return; }
   $('version').textContent = 'v' + data.version + ' · 任务记录仅保留到浏览器会话结束';
   render();
 }
@@ -75,18 +75,14 @@ $('show-fab').addEventListener('change', async () => {
   try { await chrome.storage.sync.set({ fab: $('show-fab').checked }); }
   catch (error) { feedback(error); }
 });
-$('experimental-mode').addEventListener('change', async () => {
+$('btn-embedded').addEventListener('click', async () => {
   try {
-    await send({ type: 'set-experimental-embedded', enabled: $('experimental-mode').checked });
+    await send({ type: 'set-experimental-embedded', enabled: true });
     location.replace('panel.html');
-  } catch (error) { $('experimental-mode').checked = false; feedback(error); }
-});
-$('btn-compat').addEventListener('click', async () => {
-  try { await send({ type: 'open-compat', experimental: true }); location.replace('panel.html'); }
-  catch (error) { feedback(error); }
+  } catch (error) { feedback(error); }
 });
 chrome.storage.onChanged.addListener((changes, area) => {
-  if ((area === 'session' && changes.deliveryQueueV1) || area === 'sync') refresh().catch(feedback);
+  if ((area === 'session' && (changes.deliveryQueueV1 || changes.experimentalEmbedded)) || area === 'sync' || area === 'local') refresh().catch(feedback);
 });
 (async () => {
   try { windowId = (await chrome.windows.getCurrent()).id; await refresh(); }

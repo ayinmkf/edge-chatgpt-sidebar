@@ -28,12 +28,8 @@
       <p class="muted">关闭后只填入 ChatGPT 输入框，方便你手动确认。</p>
       <label class="switch"><input id="show-fab" type="checkbox" checked><span>选中文本时显示“问 ChatGPT”</span></label>
       <details class="advanced"><summary>任务诊断</summary><pre id="diagnostic">暂无任务</pre></details>
-      <details class="advanced">
-        <summary>高级 / 实验性功能</summary>
-        <p>默认模式不会修改 ChatGPT 响应头，也不会嵌入 ChatGPT。以下功能可能受网站限制。</p>
-        <label class="switch" for="experimental-mode"><input id="experimental-mode" type="checkbox"><span>切换到内嵌侧栏（实验性）</span></label>
-        <button id="btn-compat" type="button" class="secondary">打开独立贴边窗口</button>
-      </details>
+      <button id="btn-embedded" type="button" class="secondary">返回内嵌侧栏</button>
+      <p class="muted">当前使用高级选项中的稳定投递。浏览器重启后恢复内嵌侧栏。</p>
       <p class="muted" id="version"></p>
     </main>
     <script src="stable.js"></script>

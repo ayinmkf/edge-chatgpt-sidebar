@@ -71,8 +71,15 @@ async function requestWindow(msg, sender) {
   return (await chrome.windows.getLastFocused({ windowTypes: ['normal'] })).id;
 }
 
-async function setExperimentalEmbedded(enabled) {
-  // Session-only: every browser restart returns to the stable mode.
+let modeTail = Promise.resolve();
+function setExperimentalEmbedded(enabled) {
+  const result = modeTail.then(() => applyEmbeddedMode(enabled));
+  modeTail = result.catch(() => {});
+  return result;
+}
+
+async function applyEmbeddedMode(enabled) {
+  // Session-only: every browser restart returns to embedded mode.
   await chrome.declarativeNetRequest.updateEnabledRulesets({
     enableRulesetIds: enabled ? ['headers', 'site'] : [],
     disableRulesetIds: enabled ? [] : ['headers', 'site']
@@ -91,6 +98,7 @@ async function acceptSelection(msg, sender) {
   const opening = openPanelNow(sender?.tab?.windowId);
   const windowId = await requestWindow(msg, sender);
   const panelResult = await opening;
+  await modeReady;
   const mode = await chrome.storage.session.get('experimentalEmbedded');
   if (mode.experimentalEmbedded) {
     await setPendingPrompt(msg.text, msg.source || 'selection');
@@ -300,6 +308,7 @@ async function sendToCompatWindow(text, autoSend, requestId) {
 
 const handlers = {
   async 'get-delivery-state'(msg, sender) {
+    await modeReady;
     const windowId = await requestWindow(msg, sender);
     const state = await CgptDelivery.state(windowId);
     const mode = await chrome.storage.session.get('experimentalEmbedded');
@@ -314,6 +323,7 @@ const handlers = {
   },
 
   async 'set-experimental-embedded'(msg) {
+    await modeReady;
     return { ok: true, experimentalEmbedded: await setExperimentalEmbedded(!!msg.enabled) };
   },
 
@@ -326,7 +336,9 @@ const handlers = {
   },
 
   async 'get-state'() {
+    await modeReady;
     const self = chrome.runtime.getManifest();
+    const { experimentalEmbedded } = await chrome.storage.session.get('experimentalEmbedded');
     const { compatWindow } = await chrome.storage.session.get('compatWindow').catch(() => ({}));
     return {
       ok: true,
@@ -335,7 +347,8 @@ const handlers = {
       stealth: await isStealthEnabled(),
       uaSpoof: await isUaSpoofOn(),
       compatWindowId: compatWindow?.id ?? null,
-      panelPath: 'panel/panel.html'
+      experimentalEmbedded,
+      panelPath: experimentalEmbedded ? 'panel/panel.html' : 'panel/stable.html'
     };
   },
 
@@ -480,14 +493,14 @@ async function initMenus() {
 
 async function initializeMode() {
   const mode = await chrome.storage.session.get('experimentalEmbedded');
-  await setExperimentalEmbedded(!!mode.experimentalEmbedded);
+  await setExperimentalEmbedded(mode.experimentalEmbedded !== false);
 }
+const modeReady = initializeMode();
 chrome.runtime.onInstalled.addListener(() => {
   void initMenus();
-  void initializeMode();
 });
-chrome.runtime.onStartup.addListener(() => { void initMenus(); void initializeMode(); });
-void initializeMode().catch(console.error);
+chrome.runtime.onStartup.addListener(() => { void initMenus(); });
+void modeReady.catch(console.error);
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(console.error);
 
 // Opening directly preserves activation; close() then open() could consume it.

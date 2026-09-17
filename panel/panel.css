@@ -109,6 +109,9 @@ svg.stroke {
 /* ---------------- 下拉菜单 ---------------- */
 
 .menu {
+  max-width: calc(100vw - 12px);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
   position: absolute;
   top: 34px;
   right: 6px;
@@ -139,6 +142,12 @@ svg.stroke {
 .menu-item:hover { background: var(--hover); }
 .menu-item svg { width: 14px; height: 14px; fill: currentColor; flex: 0 0 auto; }
 .menu-item input { margin: 0; accent-color: var(--accent); }
+.menu-item[aria-pressed="true"] { background: rgba(16, 163, 127, 0.15); color: var(--accent); }
+.menu-item[aria-pressed="true"]::after { content: '已开启'; margin-left: auto; font-size: 11px; }
+.menu-hint { margin: 5px 8px 9px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+#advanced-settings > summary { cursor: pointer; }
+#advanced-settings > summary::after { content: '▸'; margin-left: auto; }
+#advanced-settings[open] > summary::after { content: '▾'; }
 .menu-item.danger { color: var(--danger); }
 .menu-sep { height: 1px; margin: 4px 2px; background: var(--line); }
 

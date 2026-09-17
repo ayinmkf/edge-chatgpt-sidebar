@@ -848,7 +848,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'session' && changes.pendingPrompt) consumePendingPrompt();
   if (area === 'sync' || area === 'local') {
     let touched = false;
-    for (const key of ['autoSend', 'fab', 'hideToolbar']) {
+    for (const key of ['autoSend', 'fab', 'hideToolbar', 'legacyWrite']) {
       if (changes[key] && typeof changes[key].newValue === 'boolean') {
         state.settings[key] = changes[key].newValue;
         touched = true;
@@ -863,7 +863,8 @@ chrome.storage.onChanged.addListener((changes, area) => {
 /* ------------------------------------------------------------------ */
 
 (async function boot() {
-  const mode = await chrome.storage.session.get('experimentalEmbedded');
+  const mode = await send({ type: 'get-state' });
+  if (!mode?.ok) { setStatus('侧栏初始化失败，请重新打开侧栏', 'err'); return; }
   if (!mode.experimentalEmbedded) { location.replace('stable.html'); return; }
   const manifest = chrome.runtime.getManifest();
   el.menuVersion.textContent = `版本 ${manifest.version} · 扩展 ID ${chrome.runtime.id}`;
@@ -903,4 +904,6 @@ chrome.storage.onChanged.addListener((changes, area) => {
 document.getElementById('btn-stable').addEventListener('click', async () => {
   const result = await send({ type: 'set-experimental-embedded', enabled: false });
   if (result?.ok) location.replace('stable.html');
+  else setStatus('切换失败：' + (result?.error || '后台没有回应'), 'err');
 });
+document.getElementById('btn-slow-stable').addEventListener('click', () => document.getElementById('btn-stable').click());
