@@ -4,7 +4,12 @@ _metadata/
 # 自检产物
 panel-shot.png
 tools/last-verify.log
+tools/launch-result.txt
 dist/
 backups/
 artifacts/
 _snapshots/
+.tools/
+.env
+.env.*
+!.env.example

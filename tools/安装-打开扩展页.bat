@@ -1,4 +1,6 @@
 @echo off
+setlocal
+for %%I in ("%~dp0..") do set "CGPT_PROJECT_DIR=%%~fI"
 chcp 65001 >nul
 title 安装 / 更新 ChatGPT 侧边栏扩展
 echo.
@@ -10,7 +12,7 @@ echo  接下来会用 Edge 打开扩展管理页。请完成以下三步：
 echo.
 echo    1) 找到「ChatGPT 侧边栏」这一项，点它的【重新加载】按钮
 echo       （如果没看到这一项，点【加载解压缩的扩展】并选择：）
-echo       D:\deepseek work\edge-chatgpt-sidebar
+echo       "%CGPT_PROJECT_DIR%"
 echo.
 echo    2) 回到侧边栏：先关掉侧边栏，再重新打开
 echo       （默认是内嵌 ChatGPT；顶部设置菜单底部应显示 v0.3.2）
