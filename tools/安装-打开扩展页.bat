@@ -15,7 +15,7 @@ echo       （如果没看到这一项，点【加载解压缩的扩展】并选
 echo       "%CGPT_PROJECT_DIR%"
 echo.
 echo    2) 回到侧边栏：先关掉侧边栏，再重新打开
-echo       （默认是内嵌 ChatGPT；顶部设置菜单底部应显示 v0.4.0）
+echo       （默认是内嵌 ChatGPT；顶部设置菜单底部应显示 v0.4.1）
 echo.
 echo    3) 刷新来源网页和已有 ChatGPT 标签页，使新脚本生效
 echo.

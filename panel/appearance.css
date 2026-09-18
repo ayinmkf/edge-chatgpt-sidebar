@@ -1,0 +1,6 @@
+.appearance-settings { padding: 10px; font-size: 12px; }
+.brand-mark { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; vertical-align: middle; flex: 0 0 auto; }
+.appearance-settings label { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 10px 0; }
+.appearance-settings input { max-width: 100%; min-width: 0; box-sizing: border-box; }
+.appearance-settings input[type="text"] { width: 100%; }
+.appearance-settings p { max-width: 260px; font-size: 12px; }

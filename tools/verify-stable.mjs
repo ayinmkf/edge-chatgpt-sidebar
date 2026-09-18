@@ -48,7 +48,7 @@ try {
   const version = await sw('chrome.runtime.getManifest().version');
   const state = () => sw('chrome.storage.session.get("deliveryQueueV1").then(d=>d.deliveryQueueV1||[])');
   await check('真实 MV3 后台启动，默认内嵌入口与规则正确', async () => {
-    assert.equal(version, '0.4.0');
+    assert.equal(version, '0.4.1');
     await until(async () => (await sw('chrome.sidePanel.getOptions({})')).path === 'panel/panel.html');
     assert.deepEqual((await sw('chrome.declarativeNetRequest.getEnabledRulesets()')).sort(), ['headers','site']);
   });
@@ -110,7 +110,7 @@ try {
     await sleep(300);
     await until(async () => (await sw(`chrome.tabs.get(${lastTabId})`)).status === 'complete');
     await until(async () => {
-      try { return await sw(`chrome.tabs.sendMessage(${lastTabId},{type:'delivery-v3-ping'},{frameId:0}).then(r=>r.version==='0.4.0')`); } catch { return false; }
+      try { return await sw(`chrome.tabs.sendMessage(${lastTabId},{type:'delivery-v3-ping'},{frameId:0}).then(r=>r.version==='0.4.1')`); } catch { return false; }
     });
   }
   async function deliver(text, autoSend = true, id = crypto.randomUUID()) {

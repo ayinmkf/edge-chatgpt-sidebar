@@ -1,14 +1,11 @@
 {
   "manifest_version": 3,
   "name": "ChatGPT 侧边栏（Edge / Chrome）",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "在 Edge 或 Chrome 侧栏使用 ChatGPT，支持选区发送、仅填入和稳定标签页投递。",
   "minimum_chrome_version": "116",
   "icons": {
-    "16": "icons/16.png",
-    "32": "icons/32.png",
-    "48": "icons/48.png",
-    "128": "icons/128.png"
+    "128": "icons/management.png"
   },
   "action": {
     "default_title": "打开 / 关闭 ChatGPT 侧边栏",
@@ -75,6 +72,7 @@
         "https://*.openai.com/*"
       ],
       "js": [
+        "content/appearance-defaults.js",
         "content/selection.js"
       ],
       "all_frames": false,
@@ -94,5 +92,16 @@
         "path": "rules/site.json"
       }
     ]
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/32.png"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ]
+    }
+  ]
 }

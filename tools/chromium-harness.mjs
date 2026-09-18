@@ -1,6 +1,5 @@
 import { spawn } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, cpSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, cpSync, rmSync } from 'node:fs';
 import { join, resolve, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -20,7 +19,9 @@ export async function startBrowser(htmlForUrl) {
   ].find((path) => path && existsSync(path));
   if (!browserPath) throw Error('未找到测试浏览器，可通过 BROWSER_PATH 指定 Edge 或 Chrome for Testing');
   const browserName = /chrome/i.test(browserPath) && !/msedge/i.test(browserPath) ? 'Chrome' : 'Edge';
-  const root = mkdtempSync(join(tmpdir(), 'cgpt-stable-test-'));
+  const testRoot = join(ROOT, 'artifacts');
+  mkdirSync(testRoot, { recursive: true });
+  const root = mkdtempSync(join(testRoot, 'cgpt-stable-test-'));
   const ext = join(root, 'extension');
   for (const path of ['manifest.json', 'background', 'content', 'panel', 'rules', 'icons']) cpSync(join(ROOT, path), join(ext, path), { recursive: true });
   const profile = join(root, 'profile');
@@ -131,7 +132,7 @@ export async function startBrowser(htmlForUrl) {
         for (const call of pending.values()) { clearTimeout(call.timer); call.reject(Error('test finished')); }
         pending.clear();
         // Only this generated temporary directory can be removed.
-        const rel = relative(tmpdir(), root);
+        const rel = relative(testRoot, root);
         if (!rel.startsWith('..') && rel.startsWith('cgpt-stable-test-')) {
           try { rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 }); }
           catch { console.log('临时测试目录保留：' + root); }

@@ -1,7 +1,7 @@
 {
   "name": "edge-chrome-chatgpt-sidebar",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Development-only browser compatibility tests for the Edge and Chrome extension.",
   "type": "module",
   "scripts": {

@@ -4,9 +4,9 @@
 
 Send text selected on a web page to ChatGPT while you browse. Use it to explain concepts, translate passages, summarize excerpts, or support your reading. The extension opens ChatGPT inside the Edge or Chrome side panel by default and also offers a stable delivery mode that uses a regular ChatGPT tab.
 
-Current version: **v0.4.0**. This is an unofficial project, not affiliated with or endorsed by OpenAI, Microsoft, or Google.
+Current version: **v0.4.1**. This is an unofficial project, not affiliated with or endorsed by OpenAI, Microsoft, or Google.
 
-For X/Twitter, paste the updated share URL: `https://ayinmkf.github.io/edge-chatgpt-sidebar/?v=0.4.0`. The version parameter avoids X's cached preview from the earlier Edge-only presentation.
+For X/Twitter, paste the updated share URL: `https://ayinmkf.github.io/edge-chatgpt-sidebar/?v=0.4.1`. The version parameter avoids X's cached preview from the earlier Edge-only presentation.
 
 The extension interface is currently in Chinese. This guide includes the Chinese labels you need to find each control.
 
@@ -60,7 +60,7 @@ First confirm that ChatGPT works in a normal browser tab. Installing this extens
 
 Install this project as an unpacked extension. These instructions do not use a browser extension store. Regular users should download the package from the [latest Release](https://github.com/ayinmkf/edge-chatgpt-sidebar/releases/latest).
 
-1. Open the [latest Release](https://github.com/ayinmkf/edge-chatgpt-sidebar/releases/latest). Under **Assets**, download `chatgpt-sidebar-edge-chrome-v0.4.0.zip`. Do not choose GitHub's automatically generated Source code archives.
+1. Open the [latest Release](https://github.com/ayinmkf/edge-chatgpt-sidebar/releases/latest). Under **Assets**, download `chatgpt-sidebar-edge-chrome-v0.4.1.zip`. Do not choose GitHub's automatically generated Source code archives.
 2. Right-click the downloaded ZIP and choose **Extract All**. Extract it to a folder you intend to keep.
 3. Open the extracted folder and find the directory that directly contains `manifest.json`. You should also see folders such as `background`, `content`, and `panel`.
 4. Open the extension manager: use `edge://extensions/` in Edge or `chrome://extensions/` in Chrome.
@@ -212,4 +212,12 @@ End-to-end automation uses isolated temporary Edge and Chrome for Testing profil
 
 Use `node tools/verify-stable.mjs --screenshot artifacts/panel.png` to save test screenshots inside the project. Browser test profiles use the system temporary directory and are cleaned up on normal completion.
 
-Packaging produces `dist/chatgpt-sidebar-edge-chrome-v0.4.0.zip` with both language guides and a root `manifest.json`, plus a SHA-256 checksum. Git excludes dist, caches, backups, screenshots, and local publishing tools. No open-source license has been specified for this repository.
+Packaging produces `dist/chatgpt-sidebar-edge-chrome-v0.4.1.zip` with both language guides and a root `manifest.json`, plus a SHA-256 checksum. Git excludes dist, caches, backups, screenshots, and local publishing tools. No open-source license has been specified for this repository.
+
+## Appearance settings (v0.4.1)
+
+Open **⋯ → 外观设置 (Appearance)** in the sidebar to change the popup label (up to 30 characters), background and text colors, or upload a PNG/JPEG/WebP image (up to 5 MB). Images are center-cropped to a square and applied to the popup, sidebar header and toolbar. Changes are saved automatically and applied immediately; refresh source pages after updating the extension.
+
+Images and settings stay in browser `storage.local`; they are not synced to other devices or uploaded to this repository. “恢复默认外观” restores the standard defaults. The stable-delivery page has the same controls at its bottom. The extension management page uses a fixed black-and-white knot icon, independent of personal settings.
+
+See [asset attribution](icons/ATTRIBUTION.md). This is an unofficial extension.

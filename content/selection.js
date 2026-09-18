@@ -18,6 +18,20 @@
   const MIN_LENGTH = 2;
   const MAX_LENGTH = 20000;
 
+  const { defaults, normalize, key } = SidebarAppearance;
+  let appearance = normalize();
+  function applyAppearance() {
+    if (!fab) return;
+    fab.style.background = appearance.background;
+    fab.style.borderColor = appearance.background;
+    fab.style.color = appearance.foreground;
+    fab.querySelector('img').src = appearance.icon || chrome.runtime.getURL(defaults.iconPath);
+    fab.querySelector('span').textContent = appearance.label;
+  }
+  chrome.storage.local.get(key).then(data => { appearance = normalize(data[key]); applyAppearance(); }).catch(() => {});
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes[key]) { appearance = normalize(changes[key].newValue); applyAppearance(); }
+  });
   let host = null;
   let shadow = null;
   let fab = null;
@@ -132,17 +146,18 @@
         }
         .fab.show { display: inline-flex; }
         .fab:active { transform: translateY(1px); }
-        .fab svg { width: 13px; height: 13px; fill: currentColor; pointer-events: none; }
-        .fab span { pointer-events: none; }
+        .fab img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; pointer-events: none; }
+        .fab { max-width: calc(100vw - 16px); box-sizing: border-box; }
+        .fab img { flex: 0 0 auto; }
+        .fab span { pointer-events: none; overflow: hidden; text-overflow: ellipsis; }
       </style>
       <div class="fab" role="button" tabindex="0" title="发送选中内容到 ChatGPT 侧边栏">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 4h16v12H8l-4 4z"></path>
-        </svg>
+        <img class="personal-icon" alt="">
         <span>问 ChatGPT</span>
       </div>`;
 
     fab = shadow.querySelector('.fab');
+    applyAppearance();
 
     /*
      * 关键：宿主容器不接收指针事件，避免遮住页面本身的点击。
@@ -187,9 +202,10 @@
     if (!ensureUi()) return;
     clearTimeout(hideTimer);
     clearTimeout(hintTimer);
-    fab.querySelector('span').textContent = '问 ChatGPT';
+    fab.querySelector('span').textContent = appearance.label;
 
-    const width = 118;
+    fab.classList.add('show');
+    const width = fab.getBoundingClientRect().width || 118;
     const left = Math.min(
       Math.max(8, rect.left + rect.width / 2 - width / 2),
       window.innerWidth - width - 8
@@ -334,7 +350,7 @@
     fab.classList.add('show');
     clearTimeout(hintTimer);
     hintTimer = setTimeout(() => {
-      if (fab) fab.querySelector('span').textContent = '问 ChatGPT';
+      if (fab) fab.querySelector('span').textContent = appearance.label;
       hideFab();
     }, duration);
   }

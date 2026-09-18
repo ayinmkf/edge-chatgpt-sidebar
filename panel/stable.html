@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ChatGPT 投递侧栏</title>
     <link rel="stylesheet" href="stable.css">
+    <link rel="stylesheet" href="appearance.css">
   </head>
   <body>
     <main class="panel">
       <header>
-        <div><h1>ChatGPT 投递</h1><p>将网页选中文本发送到顶层 ChatGPT 标签页</p></div>
+        <div><h1><img class="brand-mark" src="../icons/32.png" alt=""> ChatGPT 投递</h1><p>将网页选中文本发送到顶层 ChatGPT 标签页</p></div>
         <button id="btn-open" class="icon" title="打开 ChatGPT 标签页" aria-label="打开 ChatGPT 标签页">↗</button>
       </header>
       <section class="card" aria-live="polite">
@@ -33,5 +34,7 @@
       <p class="muted" id="version"></p>
     </main>
     <script src="stable.js"></script>
+    <script src="../content/appearance-defaults.js"></script>
+    <script src="appearance.js"></script>
   </body>
 </html>

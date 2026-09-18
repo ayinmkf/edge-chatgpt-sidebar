@@ -4,9 +4,9 @@
 
 在浏览网页时，把选中的文字交给 ChatGPT，帮助你解释概念、翻译段落、总结内容和辅助阅读。扩展默认在 Edge 或 Chrome 侧栏内显示 ChatGPT，也提供将文字送到普通 ChatGPT 标签页的稳定投递方式。
 
-当前版本：**v0.4.0**。这是非官方项目，与 OpenAI、Microsoft 或 Google 没有隶属关系，也未获得其背书。
+当前版本：**v0.4.1**。这是非官方项目，与 OpenAI、Microsoft 或 Google 没有隶属关系，也未获得其背书。
 
-在 X/Twitter 分享时，请粘贴新版分享链接：`https://ayinmkf.github.io/edge-chatgpt-sidebar/?v=0.4.0`。版本参数用于避开 X 对旧版 Edge 专用预览的缓存。
+在 X/Twitter 分享时，请粘贴新版分享链接：`https://ayinmkf.github.io/edge-chatgpt-sidebar/?v=0.4.1`。版本参数用于避开 X 对旧版 Edge 专用预览的缓存。
 
 ## 使用预览
 
@@ -58,7 +58,7 @@
 
 本项目以“加载解压的扩展”方式安装，没有浏览器商店安装步骤。普通用户建议下载 [Releases](https://github.com/ayinmkf/edge-chatgpt-sidebar/releases/latest) 中的安装包。
 
-1. 打开 [最新 Release](https://github.com/ayinmkf/edge-chatgpt-sidebar/releases/latest)，在 **Assets** 中下载 `chatgpt-sidebar-edge-chrome-v0.4.0.zip`。不要下载 GitHub 自动生成的 Source code 压缩包。
+1. 打开 [最新 Release](https://github.com/ayinmkf/edge-chatgpt-sidebar/releases/latest)，在 **Assets** 中下载 `chatgpt-sidebar-edge-chrome-v0.4.1.zip`。不要下载 GitHub 自动生成的 Source code 压缩包。
 2. 下载后右键压缩包，选择“全部解压”，将文件放到你准备长期保留的位置。
 3. 打开解压后的文件夹，找到直接包含 `manifest.json` 的那一层目录。旁边应有 `background`、`content`、`panel` 等文件夹。
 4. 打开扩展管理页：Edge 输入 `edge://extensions/`；Chrome 输入 `chrome://extensions/`。
@@ -210,4 +210,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/package.ps1
 
 可使用 `node tools/verify-stable.mjs --screenshot artifacts/panel.png` 将测试截图保存在项目内。测试浏览器配置使用系统临时目录，正常结束时清理。
 
-打包生成 `dist/chatgpt-sidebar-edge-chrome-v0.4.0.zip`，包含两种语言的说明和根目录 `manifest.json`，并生成 SHA-256 校验文件。Git 不跟踪 dist、缓存、备份、测试截图或本地发布工具。仓库暂未指定开源许可证。
+打包生成 `dist/chatgpt-sidebar-edge-chrome-v0.4.1.zip`，包含两种语言的说明和根目录 `manifest.json`，并生成 SHA-256 校验文件。Git 不跟踪 dist、缓存、备份、测试截图或本地发布工具。仓库暂未指定开源许可证。
+
+## 外观设置（v0.4.1）
+
+打开侧栏顶部 **⋯ → 外观设置**，可修改浮窗文字（最多 30 字符）、背景色和文字颜色，并上传 PNG/JPEG/WebP 图片（最大 5 MB）。图片居中裁成正方形，同步应用于选区浮窗、侧栏标题和工具栏。修改后自动保存并即时应用；首次更新扩展后仍需刷新来源网页。
+
+设置和图片仅保存在当前浏览器的 `storage.local`，不会同步到其他设备或上传到项目仓库。点击“恢复默认外观”恢复通用版默认值。稳定投递页面底部也提供相同入口。扩展管理页使用固定黑白结形图标，不随个人设置变化。
+
+图标来源及归属见 [资源说明](icons/ATTRIBUTION.md)。本项目为非官方扩展。

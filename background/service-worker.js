@@ -21,6 +21,7 @@ const STEALTH_RULE_ID = 9001;
 const STEALTH_RULE_ID_OPENAI = 9003;
 const UA_RULE_ID = 9002;
 importScripts('delivery.js');
+importScripts('appearance.js');
 
 /**
  * 兼容模式用的 User-Agent。

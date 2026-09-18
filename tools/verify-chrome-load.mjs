@@ -25,7 +25,7 @@ try {
     panel: await chrome.sidePanel.getOptions({}),
     rulesets: await chrome.declarativeNetRequest.getEnabledRulesets()
   }));
-  assert.equal(state.version, '0.4.0');
+  assert.equal(state.version, '0.4.1');
   assert.equal(state.hasSidePanel, true);
   assert.equal(state.panel.path, 'panel/panel.html');
   assert.deepEqual(state.rulesets.sort(), ['headers', 'site']);

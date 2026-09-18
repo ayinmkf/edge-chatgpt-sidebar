@@ -5,7 +5,7 @@ $manifest = Get-Content -LiteralPath (Join-Path $projectPath 'manifest.json') -R
 $archiveName = "chatgpt-sidebar-edge-chrome-v$($manifest.version).zip"
 $archivePath = Join-Path $distPath $archiveName
 $checksumPath = "$archivePath.sha256"
-$files = @('manifest.json', 'README.md', 'README.en.md', 'background', 'content', 'panel', 'rules', 'icons', 'tools', 'docs') |
+$files = @('manifest.json', 'README.md', 'README.en.md', 'PROJECT_CONTEXT.md', 'CHANGELOG.md', 'background', 'content', 'panel', 'rules', 'icons', 'tools', 'docs') |
     ForEach-Object { Join-Path $projectPath $_ }
 New-Item -ItemType Directory -Path $distPath -Force | Out-Null
 if (Test-Path -LiteralPath $archivePath) {
