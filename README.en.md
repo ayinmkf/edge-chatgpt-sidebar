@@ -1,10 +1,12 @@
 # ChatGPT Sidebar for Microsoft Edge
 
-[简体中文](README.md) | **English**
+[简体中文](README.md) | **English** | [Share page](https://ayinmkf.github.io/edge-chatgpt-sidebar/)
 
 Send text selected on a web page to ChatGPT while you browse. Use it to explain concepts, translate passages, summarize excerpts, or support your reading. The extension opens ChatGPT inside the Edge sidebar by default and also offers a stable delivery mode that uses a regular ChatGPT tab.
 
 Current version: **v0.3.2**. This is an unofficial project, not affiliated with or endorsed by OpenAI or Microsoft.
+
+For X/Twitter, paste the complete project-page URL: `https://ayinmkf.github.io/edge-chatgpt-sidebar/`.
 
 The extension interface is currently in Chinese. This guide includes the Chinese labels you need to find each control.
 

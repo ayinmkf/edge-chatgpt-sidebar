@@ -1,10 +1,12 @@
 # ChatGPT 侧边栏 · Microsoft Edge 扩展
 
-**简体中文** | [English](README.en.md)
+**简体中文** | [English](README.en.md) | [项目分享页](https://ayinmkf.github.io/edge-chatgpt-sidebar/)
 
 在浏览网页时，把选中的文字交给 ChatGPT，帮助你解释概念、翻译段落、总结内容和辅助阅读。扩展默认在 Edge 侧栏内显示 ChatGPT，也提供将文字送到普通 ChatGPT 标签页的稳定投递方式。
 
 当前版本：**v0.3.2**。这是非官方项目，与 OpenAI 或 Microsoft 没有隶属关系，也未获得其背书。
+
+在 X/Twitter 分享时，请粘贴完整项目页链接：`https://ayinmkf.github.io/edge-chatgpt-sidebar/`。
 
 ## 使用预览
 
