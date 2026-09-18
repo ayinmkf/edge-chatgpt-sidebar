@@ -6,6 +6,18 @@
 
 当前版本：**v0.3.2**。这是非官方项目，与 OpenAI 或 Microsoft 没有隶属关系，也未获得其背书。
 
+## 使用预览
+
+在普通网页选中文字后，绿色“问 ChatGPT”按钮会出现在选区附近：
+
+![在真实 Microsoft Edge 网页中选择文字后出现“问 ChatGPT”按钮](docs/images/selection-popup.png)
+
+点击按钮后，所选原文进入真实 ChatGPT 内嵌侧栏；下图关闭了自动发送，因此文字停留在输入框中等待确认：
+
+<img src="docs/images/embedded-sidebar.png" alt="真实 Microsoft Edge 中的 ChatGPT 内嵌侧栏已填入所选文字" width="420">
+
+预览截取自实际 Microsoft Edge 和 ChatGPT 页面，并已裁去账号、历史记录及其他标签。ChatGPT 页面外观可能随网站更新而变化。
+
 ## 1. 这个项目可以做什么？
 
 例如，你正在阅读文章，遇到一段难懂的解释，可以选择这段文字，点击选区附近的“问 ChatGPT”，把它填入侧栏内的 ChatGPT。
@@ -32,9 +44,9 @@
 
 ## 3. 下载与安装：第一次使用
 
-本项目以“加载解压的扩展”方式安装，没有浏览器商店安装步骤。
+本项目以“加载解压的扩展”方式安装，没有浏览器商店安装步骤。普通用户建议下载 [Releases](https://github.com/ayinmkf/edge-chatgpt-sidebar/releases/latest) 中的安装包。
 
-1. 在本 GitHub 仓库首页点击绿色 **Code** 按钮，再点击 **Download ZIP**。
+1. 打开 [最新 Release](https://github.com/ayinmkf/edge-chatgpt-sidebar/releases/latest)，在 **Assets** 中下载 `edge-chatgpt-sidebar-v0.3.2.zip`。不要下载 GitHub 自动生成的 Source code 压缩包。
 2. 下载后右键压缩包，选择“全部解压”，将文件放到你准备长期保留的位置。
 3. 打开解压后的文件夹，找到直接包含 `manifest.json` 的那一层目录。旁边应有 `background`、`content`、`panel` 等文件夹。
 4. 在 Edge 地址栏输入 `edge://extensions/`，按回车。
@@ -45,7 +57,7 @@
 9. 点击 Edge 工具栏上的扩展图标，找到本扩展，选择显示在工具栏上；不同 Edge 版本可能显示图钉或眼睛图标。
 10. 刷新你准备选中文字的网页，然后点击扩展图标打开侧栏。
 
-安装后不要移动或删除这个文件夹，Edge 会继续从这里读取扩展文件。下载源码 ZIP 时看不到 `dist` 是正常的，源码目录本身即可加载，无需构建。
+安装后不要移动或删除这个文件夹，Edge 会继续从这里读取扩展文件。如果你需要源码，也可以在仓库首页点击 **Code → Download ZIP**；源码目录同样可以直接加载，无需构建。
 
 如果有人给你本项目生成的 `edge-chatgpt-sidebar.zip`，同样先解压，再选择包含 `manifest.json` 的目录加载。不要同时加载两份，否则可能出现重复按钮。
 

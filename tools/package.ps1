@@ -3,7 +3,7 @@ $projectPath = Split-Path -Parent $PSScriptRoot
 $distPath = Join-Path $projectPath 'dist'
 $archivePath = Join-Path $distPath 'edge-chatgpt-sidebar.zip'
 $manifest = Get-Content -LiteralPath (Join-Path $projectPath 'manifest.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-$files = @('manifest.json', 'README.md', 'README.en.md', 'background', 'content', 'panel', 'rules', 'icons', 'tools') |
+$files = @('manifest.json', 'README.md', 'README.en.md', 'background', 'content', 'panel', 'rules', 'icons', 'tools', 'docs') |
     ForEach-Object { Join-Path $projectPath $_ }
 New-Item -ItemType Directory -Path $distPath -Force | Out-Null
 if (Test-Path -LiteralPath $archivePath) {
