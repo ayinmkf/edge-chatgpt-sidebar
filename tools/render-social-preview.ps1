@@ -11,7 +11,7 @@ $browserPaths = @(
 $browserPath = $browserPaths | Where-Object { $_ -and (Test-Path -LiteralPath $_) } | Select-Object -First 1
 if (-not $browserPath) { throw 'Edge or Chrome was not found. Set BROWSER_PATH and retry.' }
 $templatePath = Join-Path $projectPath 'docs\social-card-template.html'
-$outputPath = Join-Path $projectPath 'docs\images\social-preview.png'
+$outputPath = Join-Path $projectPath 'docs\images\social-preview-v0.4.0.png'
 $profilePath = Join-Path $projectPath '.tools\social-card-profile'
 New-Item -ItemType Directory -Path $profilePath -Force | Out-Null
 $templateUrl = ([Uri]$templatePath).AbsoluteUri

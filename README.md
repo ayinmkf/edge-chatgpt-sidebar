@@ -6,7 +6,7 @@
 
 当前版本：**v0.4.0**。这是非官方项目，与 OpenAI、Microsoft 或 Google 没有隶属关系，也未获得其背书。
 
-在 X/Twitter 分享时，请粘贴完整项目页链接：`https://ayinmkf.github.io/edge-chatgpt-sidebar/`。
+在 X/Twitter 分享时，请粘贴新版分享链接：`https://ayinmkf.github.io/edge-chatgpt-sidebar/?v=0.4.0`。版本参数用于避开 X 对旧版 Edge 专用预览的缓存。
 
 ## 使用预览
 

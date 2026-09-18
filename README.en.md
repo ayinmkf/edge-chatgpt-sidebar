@@ -6,7 +6,7 @@ Send text selected on a web page to ChatGPT while you browse. Use it to explain 
 
 Current version: **v0.4.0**. This is an unofficial project, not affiliated with or endorsed by OpenAI, Microsoft, or Google.
 
-For X/Twitter, paste the complete project-page URL: `https://ayinmkf.github.io/edge-chatgpt-sidebar/`.
+For X/Twitter, paste the updated share URL: `https://ayinmkf.github.io/edge-chatgpt-sidebar/?v=0.4.0`. The version parameter avoids X's cached preview from the earlier Edge-only presentation.
 
 The extension interface is currently in Chinese. This guide includes the Chinese labels you need to find each control.
 
