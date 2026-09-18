@@ -205,7 +205,7 @@ function onReadyTimeout() {
       <p class="overlay-title">还没连上 ChatGPT</p>
       <p class="overlay-hint">
         如果下面显示的是「Just a moment…」人机验证：点「打开标签页验证」，
-        在标签页里过一次验证即可（同一 Edge 配置共享），完成后这里会自动刷新。<br>
+        在标签页里过一次验证即可（同一浏览器配置共享），完成后这里会自动刷新。<br>
         若一直连不上，用「兼容模式」最稳：把 ChatGPT 放进独立贴边窗口，不受嵌入限制。
       </p>
       <div class="overlay-actions">
@@ -820,8 +820,10 @@ el.btnDiag.addEventListener('click', () => {
 
 el.btnShortcut.addEventListener('click', () => {
   el.menu.hidden = true;
-  chrome.tabs.create({ url: 'edge://extensions/shortcuts' }).catch(() => {
-    setStatus('无法打开快捷键设置页，请手动访问 edge://extensions/shortcuts', 'warn');
+  const isEdge = /\bEdg\//.test(navigator.userAgent);
+  const shortcutUrl = isEdge ? 'edge://extensions/shortcuts' : 'chrome://extensions/shortcuts';
+  chrome.tabs.create({ url: shortcutUrl }).catch(() => {
+    setStatus('无法打开快捷键设置页，请手动访问 ' + shortcutUrl, 'warn');
   });
 });
 

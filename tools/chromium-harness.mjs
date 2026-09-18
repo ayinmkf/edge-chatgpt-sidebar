@@ -11,14 +11,20 @@ export async function until(fn, timeout = 15000) {
   while (Date.now() < end) { const value = await fn(); if (value) return value; await sleep(80); }
   throw Error('等待条件超时');
 }
-export async function startEdge(htmlForUrl) {
-  const edge = [process.env.EDGE_PATH, 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe', 'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe'].find((path) => path && existsSync(path));
-  if (!edge) throw Error('未找到 Edge，可通过 EDGE_PATH 指定路径');
+export async function startBrowser(htmlForUrl) {
+  const browserPath = [
+    process.env.BROWSER_PATH,
+    process.env.EDGE_PATH,
+    'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+    'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe'
+  ].find((path) => path && existsSync(path));
+  if (!browserPath) throw Error('未找到测试浏览器，可通过 BROWSER_PATH 指定 Edge 或 Chrome for Testing');
+  const browserName = /chrome/i.test(browserPath) && !/msedge/i.test(browserPath) ? 'Chrome' : 'Edge';
   const root = mkdtempSync(join(tmpdir(), 'cgpt-stable-test-'));
   const ext = join(root, 'extension');
   for (const path of ['manifest.json', 'background', 'content', 'panel', 'rules', 'icons']) cpSync(join(ROOT, path), join(ext, path), { recursive: true });
   const profile = join(root, 'profile');
-  const child = spawn(edge, [
+  const child = spawn(browserPath, [
     '--headless=new', '--no-first-run', '--no-default-browser-check', '--disable-background-networking',
     '--disable-sync', '--window-size=1200,900', '--remote-debugging-port=0',
     '--no-proxy-server', '--host-resolver-rules=MAP chatgpt.com ~NOTFOUND',
@@ -116,7 +122,7 @@ export async function startEdge(htmlForUrl) {
       });
       return entry;
     }
-    return { send, evaluate, page, sessions, errors, worker, extensionId, root,
+    return { send, evaluate, page, sessions, errors, worker, extensionId, root, browserName, browserPath,
       async close() {
         try { await send('Browser.close'); } catch {}
         ws.close();

@@ -10,6 +10,7 @@ backups/
 artifacts/
 _snapshots/
 .tools/
+node_modules/
 .env
 .env.*
 !.env.example

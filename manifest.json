@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "ChatGPT 侧边栏",
-  "version": "0.3.2",
-  "description": "默认在 Edge 侧栏内使用 ChatGPT，支持选区发送和仅填入；顶部设置可开关功能，高级选项提供稳定标签页投递。",
+  "name": "ChatGPT 侧边栏（Edge / Chrome）",
+  "version": "0.4.0",
+  "description": "在 Edge 或 Chrome 侧栏使用 ChatGPT，支持选区发送、仅填入和稳定标签页投递。",
   "minimum_chrome_version": "116",
   "icons": {
     "16": "icons/16.png",

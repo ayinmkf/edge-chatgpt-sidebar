@@ -26,11 +26,11 @@ importScripts('delivery.js');
  * 兼容模式用的 User-Agent。
  *
  * 背景：本机能观察到 Cloudflare 会对无头/自动化浏览器返回 403 挑战页（cf-mitigated:
- * challenge）。正常情况下你自己的 Edge 是普通浏览器，不会遇到；但如果你所在网络出口
+ * challenge）。正常情况下你自己的浏览器不会遇到；但如果你所在网络出口
  * 比较敏感、面板里始终看到「Just a moment...」，可以打开「伪装 User-Agent」试试。
  */
-const UA_SPOOF_VALUE =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0';
+const UA_SPOOF_VALUE = globalThis.navigator?.userAgent ||
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36';
 
 /** 待发送到面板的文本（面板启动或已打开时消费） */
 async function setPendingPrompt(text, source) {

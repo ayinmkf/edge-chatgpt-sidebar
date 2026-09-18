@@ -1,10 +1,10 @@
-# ChatGPT 侧边栏 · Microsoft Edge 扩展
+# ChatGPT 侧边栏 · Edge / Chrome 扩展
 
 **简体中文** | [English](README.en.md) | [项目分享页](https://ayinmkf.github.io/edge-chatgpt-sidebar/)
 
-在浏览网页时，把选中的文字交给 ChatGPT，帮助你解释概念、翻译段落、总结内容和辅助阅读。扩展默认在 Edge 侧栏内显示 ChatGPT，也提供将文字送到普通 ChatGPT 标签页的稳定投递方式。
+在浏览网页时，把选中的文字交给 ChatGPT，帮助你解释概念、翻译段落、总结内容和辅助阅读。扩展默认在 Edge 或 Chrome 侧栏内显示 ChatGPT，也提供将文字送到普通 ChatGPT 标签页的稳定投递方式。
 
-当前版本：**v0.3.2**。这是非官方项目，与 OpenAI 或 Microsoft 没有隶属关系，也未获得其背书。
+当前版本：**v0.4.0**。这是非官方项目，与 OpenAI、Microsoft 或 Google 没有隶属关系，也未获得其背书。
 
 在 X/Twitter 分享时，请粘贴完整项目页链接：`https://ayinmkf.github.io/edge-chatgpt-sidebar/`。
 
@@ -37,31 +37,41 @@
 
 ## 2. 使用前准备
 
-- 一台安装了较新版本 Microsoft Edge 的电脑。本项目主要在 Windows 上开发和测试。
+- 一台安装了 Microsoft Edge 或 Google Chrome 的电脑。Chrome 需要 116 或更高版本；Edge 需要支持 Side Panel API 的较新版本。本项目主要在 Windows 上开发和测试。
 - 你的网络能够正常打开 [ChatGPT](https://chatgpt.com/)，并按网站要求完成登录或验证。
 - 本项目使用 ChatGPT 网页，不需要配置 API Key，也不要求购买 API 服务。网页账号可用的功能、额度及订阅仍由 ChatGPT 决定。
 - **普通使用者不需要 Node.js、Git 或命令行。** 它们只用于开发、测试或源码管理。
 
 建议先在普通标签页确认 ChatGPT 可以正常使用。如果普通标签页也无法打开，安装本扩展不会解决网络或账号访问问题。
 
+### 浏览器兼容性
+
+| 浏览器 | 状态 | 说明 |
+| --- | --- | --- |
+| Microsoft Edge | 正式支持 | 已在 Edge 152 完成自动化验收 |
+| Google Chrome | 正式支持 | 已用 Chrome for Testing 153 完成同一套自动化验收 |
+| Brave / Vivaldi / Opera | 可能兼容，尚未完整验收 | 基于 Chromium，但侧栏实现和浏览器策略可能不同 |
+| Firefox | 当前不支持 | 使用与 Chromium 不兼容的 `sidebar_action/sidebarAction` API |
+| Safari | 当前不支持 | 需要单独转换、签名和侧栏适配 |
+
 ## 3. 下载与安装：第一次使用
 
 本项目以“加载解压的扩展”方式安装，没有浏览器商店安装步骤。普通用户建议下载 [Releases](https://github.com/ayinmkf/edge-chatgpt-sidebar/releases/latest) 中的安装包。
 
-1. 打开 [最新 Release](https://github.com/ayinmkf/edge-chatgpt-sidebar/releases/latest)，在 **Assets** 中下载 `edge-chatgpt-sidebar-v0.3.2.zip`。不要下载 GitHub 自动生成的 Source code 压缩包。
+1. 打开 [最新 Release](https://github.com/ayinmkf/edge-chatgpt-sidebar/releases/latest)，在 **Assets** 中下载 `chatgpt-sidebar-edge-chrome-v0.4.0.zip`。不要下载 GitHub 自动生成的 Source code 压缩包。
 2. 下载后右键压缩包，选择“全部解压”，将文件放到你准备长期保留的位置。
 3. 打开解压后的文件夹，找到直接包含 `manifest.json` 的那一层目录。旁边应有 `background`、`content`、`panel` 等文件夹。
-4. 在 Edge 地址栏输入 `edge://extensions/`，按回车。
+4. 打开扩展管理页：Edge 输入 `edge://extensions/`；Chrome 输入 `chrome://extensions/`。
 5. 打开页面上的 **开发人员模式** 开关。
 6. 点击 **加载解压缩的扩展**（有的版本显示“加载解压的扩展”）。
 7. 选择第 3 步找到的目录。不要选择 ZIP 文件，也不要选到 `panel` 子目录或外面多套的一层文件夹。
 8. 确认扩展列表中出现 **ChatGPT 侧边栏**，并处于开启状态。
-9. 点击 Edge 工具栏上的扩展图标，找到本扩展，选择显示在工具栏上；不同 Edge 版本可能显示图钉或眼睛图标。
+9. 点击浏览器工具栏上的扩展图标，找到本扩展并固定到工具栏；不同版本可能显示图钉或眼睛图标。
 10. 刷新你准备选中文字的网页，然后点击扩展图标打开侧栏。
 
-安装后不要移动或删除这个文件夹，Edge 会继续从这里读取扩展文件。如果你需要源码，也可以在仓库首页点击 **Code → Download ZIP**；源码目录同样可以直接加载，无需构建。
+安装后不要移动或删除这个文件夹，浏览器会继续从这里读取扩展文件。如果你需要源码，也可以在仓库首页点击 **Code → Download ZIP**；源码目录同样可以直接加载，无需构建。
 
-如果有人给你本项目生成的 `edge-chatgpt-sidebar.zip`，同样先解压，再选择包含 `manifest.json` 的目录加载。不要同时加载两份，否则可能出现重复按钮。
+如果有人给你本项目生成的通用 ZIP，同样先解压，再选择包含 `manifest.json` 的目录加载。不要同时加载两份，否则可能出现重复按钮。
 
 ## 4. 第一次成功投递
 
@@ -74,7 +84,7 @@
 7. 在原文前补充“请解释这段话”等要求，检查内容，然后点击 ChatGPT 的发送按钮。
 8. 确认对话中出现了自己的消息，再等待回复。
 
-也可以选择文字后点击鼠标右键，选择“发送选中内容到 ChatGPT 侧边栏”。`Ctrl+Shift+Y` 用于打开侧栏，**不会自动发送当前选区**；快捷键可在 `edge://extensions/shortcuts` 中调整。
+也可以选择文字后点击鼠标右键，选择“发送选中内容到 ChatGPT 侧边栏”。`Ctrl+Shift+Y` 用于打开侧栏，**不会自动发送当前选区**；快捷键可在 Edge 的 `edge://extensions/shortcuts` 或 Chrome 的 `chrome://extensions/shortcuts` 中调整。
 
 ### 自动发送与仅填入
 
@@ -99,13 +109,13 @@ ChatGPT 输入框已有草稿时，扩展会停止写入，避免覆盖或误提
 | 高级选项 → UA 伪装 | 关闭 | 尝试改变内嵌导航的浏览器标识；仅当前会话生效，不保证解决验证 |
 | 高级选项 → 自检 / 诊断 | 手动运行 | 查看嵌入规则或输入框相关信息，供故障排查 |
 
-模式切换在当前浏览器会话内有效。后台休眠、重新打开侧栏不会重置模式；**结束浏览器会话后重新启动、重新加载扩展或更新扩展后，恢复默认内嵌模式**。Edge 若仍在后台运行，仅关闭窗口可能并没有结束浏览器会话。
+模式切换在当前浏览器会话内有效。后台休眠、重新打开侧栏不会重置模式；**结束浏览器会话后重新启动、重新加载扩展或更新扩展后，恢复默认内嵌模式**。浏览器若仍在后台运行，仅关闭窗口可能并没有结束会话。
 
 ## 6. 三种使用方式与内嵌失败时的处理
 
 | 方式 | ChatGPT 显示位置 | 使用时机 |
 | --- | --- | --- |
-| 内嵌侧栏（默认） | Edge 侧栏中 | 希望边看网页边聊天 |
+| 内嵌侧栏（默认） | Edge 或 Chrome 侧栏中 | 希望边看网页边聊天 |
 | 稳定投递 | 同一浏览器窗口的普通 ChatGPT 标签页 | 内嵌受限、登录验证不成功，或需要队列和任务诊断 |
 | 独立贴边窗口 | 单独的 ChatGPT 窗口 | 希望使用单独窗口并排阅读 |
 
@@ -136,7 +146,7 @@ ChatGPT 输入框已有草稿时，扩展会停止写入，避免覆盖或误提
 
 ### 没有“问 ChatGPT”浮窗
 
-先确认扩展已启用、设置中的浮窗开关已开启，并刷新来源网页。选择至少两个字符。Edge 内部页面、扩展商店及 ChatGPT 页面本身不显示这个浮窗；子框架中的文字可尝试右键菜单。
+先确认扩展已启用、设置中的浮窗开关已开启，并刷新来源网页。选择至少两个字符。浏览器内部页面、扩展商店及 ChatGPT 页面本身不显示这个浮窗；子框架中的文字可尝试右键菜单。
 
 ### 点击后提示“扩展已更新”或没有反应
 
@@ -156,13 +166,13 @@ ChatGPT 输入框已有草稿时，扩展会停止写入，避免覆盖或误提
 
 ### 出现两个浮窗或两份扩展
 
-在 `edge://extensions/` 中确认本项目只启用一份，然后刷新网页。其他插件不必长期关闭；只有问题与某个插件同时开启有关时才单独排查。
+在 Edge 的 `edge://extensions/` 或 Chrome 的 `chrome://extensions/` 中确认本项目只启用一份，然后刷新网页。其他插件不必长期关闭；只有问题与某个插件同时开启有关时才单独排查。
 
 ### 如何更新
 
 1. 下载新版源码 ZIP 并解压。
 2. 备份自己改过的文件，再把新版文件更新到原安装目录，避免多套一层目录。
-3. 打开 `edge://extensions/`，找到本扩展，点击“重新加载”。
+3. 打开 Edge 的 `edge://extensions/` 或 Chrome 的 `chrome://extensions/`，找到本扩展，点击“重新加载”。
 4. 关闭旧侧栏后重新打开，在顶部设置菜单底部核对版本。
 5. **刷新来源网页及已有 ChatGPT 标签页**，让新脚本生效。
 
@@ -170,23 +180,23 @@ ChatGPT 输入框已有草稿时，扩展会停止写入，避免覆盖或误提
 
 - 点击发送后，选中的原文会交给 ChatGPT 网页，并受该网站的数据处理规则约束。扩展没有额外的第三方转发服务或遥测。
 - 投递内容暂存在本机浏览器的会话存储中，后台休眠后保留；结束浏览器会话或重新加载扩展后清空。ChatGPT 网站本身保存的聊天不受这个清空动作影响。
-- 开关偏好使用扩展存储；Edge 开启同步时，部分设置可能随浏览器同步。
+- 开关偏好使用扩展存储；浏览器开启扩展同步时，部分设置可能随浏览器同步。
 - 网页访问权限用于在普通网页显示选区按钮、与 ChatGPT 编辑器交互。侧栏、标签页、脚本注入、右键菜单和 alarms 权限用于对应功能及队列恢复。
 - 内嵌模式开启响应头修改规则，以支持 iframe 加载；稳定模式关闭这些内嵌规则。
 - 临时隐身只调整内嵌导航请求中的 Cookie / Authorization，**不是完整的隐私隔离环境**。
-- **退出登录 ChatGPT（清除 Cookie）** 会影响同一 Edge 配置中的其他 ChatGPT 标签页，操作前会再次确认。
+- **退出登录 ChatGPT（清除 Cookie）** 会影响当前浏览器配置中的其他 ChatGPT 标签页，操作前会再次确认。
 - 诊断可能涉及所选文字片段或页面信息。公开提交 Issue 前先检查内容，删除聊天原文、账号信息和敏感数据。
 
 ## 9. 开发、测试与打包
 
 以下只面向开发者，普通用户不需要执行。
 
-项目使用 Manifest V3，无运行时依赖，也无需编译。测试需要 Node.js 22+ 与 Microsoft Edge，可通过 `EDGE_PATH` 指定浏览器程序路径。
+项目使用 Manifest V3，无运行时依赖，也无需编译。开发测试需要 Node.js 22+；执行 `npm install` 会安装开发专用 Puppeteer 和 Chrome for Testing。可通过 `BROWSER_PATH` 指定 Edge 或测试版 Chrome，旧的 `EDGE_PATH` 仍兼容。
 
 ```powershell
-node tools/verify-queue.mjs
-node tools/verify-stable.mjs
-node tools/verify-fab.mjs
+npm install
+npm run test:logic
+npm run test:browsers
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/package.ps1
 ```
 
@@ -196,8 +206,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/package.ps1
 - `rules/`：内嵌相关规则。
 - `tools/`：测试、图标工具、安装助手及打包脚本。
 
-完整链路自动化使用独立临时 Edge 配置及**本地模拟 ChatGPT 页面**，不会连接真实账号；它不能代替真实网站上的登录、验证及内嵌验收。
+完整链路自动化在 Edge 和 Chrome for Testing 中使用独立临时配置及**本地模拟 ChatGPT 页面**，不会连接真实账号；它不能代替真实网站上的登录、验证及内嵌验收。
 
 可使用 `node tools/verify-stable.mjs --screenshot artifacts/panel.png` 将测试截图保存在项目内。测试浏览器配置使用系统临时目录，正常结束时清理。
 
-打包生成 `dist/edge-chatgpt-sidebar.zip`，包含两种语言的说明；覆盖前保留旧包。Git 不跟踪 dist、缓存、备份、测试截图或本地发布工具。仓库暂未指定开源许可证。
+打包生成 `dist/chatgpt-sidebar-edge-chrome-v0.4.0.zip`，包含两种语言的说明和根目录 `manifest.json`，并生成 SHA-256 校验文件。Git 不跟踪 dist、缓存、备份、测试截图或本地发布工具。仓库暂未指定开源许可证。

@@ -1,13 +1,15 @@
 $ErrorActionPreference = 'Stop'
 $projectPath = Split-Path -Parent $PSScriptRoot
 $distPath = Join-Path $projectPath 'dist'
-$archivePath = Join-Path $distPath 'edge-chatgpt-sidebar.zip'
 $manifest = Get-Content -LiteralPath (Join-Path $projectPath 'manifest.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$archiveName = "chatgpt-sidebar-edge-chrome-v$($manifest.version).zip"
+$archivePath = Join-Path $distPath $archiveName
+$checksumPath = "$archivePath.sha256"
 $files = @('manifest.json', 'README.md', 'README.en.md', 'background', 'content', 'panel', 'rules', 'icons', 'tools', 'docs') |
     ForEach-Object { Join-Path $projectPath $_ }
 New-Item -ItemType Directory -Path $distPath -Force | Out-Null
 if (Test-Path -LiteralPath $archivePath) {
-    $backupPath = Join-Path $distPath ('edge-chatgpt-sidebar-before-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '.zip')
+    $backupPath = Join-Path $distPath ('chatgpt-sidebar-edge-chrome-before-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '.zip')
     Copy-Item -LiteralPath $archivePath -Destination $backupPath
 }
 Compress-Archive -LiteralPath $files -DestinationPath $archivePath -Force
@@ -25,4 +27,7 @@ try {
     }
     Write-Host "Package verified: v$($packed.version), $($archive.Entries.Count) entries"
 } finally { $archive.Dispose() }
-Get-FileHash -LiteralPath $archivePath -Algorithm SHA256
+$hash = Get-FileHash -LiteralPath $archivePath -Algorithm SHA256
+Set-Content -LiteralPath $checksumPath -Value "$($hash.Hash.ToLowerInvariant())  $archiveName" -Encoding ASCII
+$hash
+Get-Item -LiteralPath $archivePath, $checksumPath | Select-Object FullName, Length

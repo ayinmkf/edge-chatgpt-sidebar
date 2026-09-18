@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { writeFileSync } from 'node:fs';
-import { startEdge, until, sleep } from './edge-harness.mjs';
+import { startBrowser, until, sleep } from './chromium-harness.mjs';
 
 // All ChatGPT responses are intercepted locally in the isolated browser. No real account or prompts are used.
 function mock(url) {
@@ -37,23 +37,23 @@ const server = createServer((request, response) => {
   response.end('<!doctype html><meta charset="utf-8"><p id="selection" style="margin:80px;font-size:24px">选区完整链路：中文第一行，第二行 ABC。</p>');
 });
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
-let edge; let passed = 0;
+let browser; let passed = 0;
 const screenshot = process.argv[process.argv.indexOf('--screenshot') + 1];
 const hasScreenshot = process.argv.includes('--screenshot');
 async function check(name, fn) { await fn(); passed++; console.log('[通过] ' + name); }
 try {
-  edge = await startEdge(mock);
-  console.log('Edge 独立配置已加载扩展 ' + edge.extensionId);
-  const sw = (code) => edge.evaluate(edge.worker.sessionId, code);
+  browser = await startBrowser(mock);
+  console.log(browser.browserName + ' 独立配置已加载扩展 ' + browser.extensionId);
+  const sw = (code) => browser.evaluate(browser.worker.sessionId, code);
   const version = await sw('chrome.runtime.getManifest().version');
   const state = () => sw('chrome.storage.session.get("deliveryQueueV1").then(d=>d.deliveryQueueV1||[])');
   await check('真实 MV3 后台启动，默认内嵌入口与规则正确', async () => {
-    assert.equal(version, '0.3.2');
+    assert.equal(version, '0.4.0');
     await until(async () => (await sw('chrome.sidePanel.getOptions({})')).path === 'panel/panel.html');
     assert.deepEqual((await sw('chrome.declarativeNetRequest.getEnabledRulesets()')).sort(), ['headers','site']);
   });
-  const embedded = await edge.page('chrome-extension://' + edge.extensionId + '/panel/panel.html');
-  const embeddedUi = (code) => edge.evaluate(embedded.sessionId, code);
+  const embedded = await browser.page('chrome-extension://' + browser.extensionId + '/panel/panel.html');
+  const embeddedUi = (code) => browser.evaluate(embedded.sessionId, code);
   await until(async () => (await embeddedUi('document.querySelector("#status-text").textContent')).includes('已连接'));
   await check('内嵌顶部设置包含常用开关和折叠高级选项，设置即时保存', async () => {
     await embeddedUi('document.querySelector("#btn-menu").click()');
@@ -67,10 +67,10 @@ try {
     await until(async () => (await embeddedUi('document.querySelector("#status-text").textContent')).includes('已填入'));
     await embeddedUi('document.querySelector("#opt-autosend").click();document.querySelector("#opt-fab").click()');
     await until(async () => (await sw('chrome.storage.sync.get("fab")')).fab === true);
-    await edge.send('Emulation.setDeviceMetricsOverride',{width:320,height:500,deviceScaleFactor:1,mobile:false},embedded.sessionId);
+    await browser.send('Emulation.setDeviceMetricsOverride',{width:320,height:500,deviceScaleFactor:1,mobile:false},embedded.sessionId);
     assert.equal(await embeddedUi('document.querySelector("#advanced-settings").open=true;document.documentElement.scrollWidth <= innerWidth'),true);
     if (hasScreenshot) {
-      const shot=await edge.send('Page.captureScreenshot',{format:'png'},embedded.sessionId);
+      const shot=await browser.send('Page.captureScreenshot',{format:'png'},embedded.sessionId);
       writeFileSync(screenshot.replace(/\.png$/i,'-embedded.png'),Buffer.from(shot.data,'base64'));
     }
   });
@@ -81,14 +81,14 @@ try {
     await sw('initializeMode()');
     assert.equal((await sw('chrome.sidePanel.getOptions({})')).path,'panel/stable.html');
   });
-  const source = await edge.page('http://127.0.0.1:' + server.address().port + '/');
-  const content = (code) => edge.evaluate(source.sessionId, code);
+  const source = await browser.page('http://127.0.0.1:' + server.address().port + '/');
+  const content = (code) => browser.evaluate(source.sessionId, code);
   await until(() => content('!!document.documentElement.getAttribute("data-cgpt-selection-diag")'));
   await check('真实鼠标点击浮窗 → 原生侧栏打开 → 新建 ChatGPT → 自动发送', async () => {
     await content(`(() => { const r=document.createRange();r.selectNodeContents(document.querySelector('#selection'));const s=getSelection();s.removeAllRanges();s.addRange(r); document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true})); })()`);
     const coords = await until(async () => content(`(() => {const b=document.querySelector('#__cgpt_sidepanel_host__')?.shadowRoot?.querySelector('.fab');if(!b?.classList.contains('show'))return null;const r=b.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2};})()`));
-    await edge.send('Input.dispatchMouseEvent', { type:'mousePressed', ...coords, button:'left', clickCount:1 }, source.sessionId);
-    await edge.send('Input.dispatchMouseEvent', { type:'mouseReleased', ...coords, button:'left', clickCount:1 }, source.sessionId);
+    await browser.send('Input.dispatchMouseEvent', { type:'mousePressed', ...coords, button:'left', clickCount:1 }, source.sessionId);
+    await browser.send('Input.dispatchMouseEvent', { type:'mouseReleased', ...coords, button:'left', clickCount:1 }, source.sessionId);
     const job = await until(async () => (await state()).find((job) => ['sent','failed','uncertain','filled'].includes(job.status)), 40000);
     assert.equal(job.status, 'sent', JSON.stringify(job));
     assert.equal(job.panelOpened, true, job.panelError);
@@ -96,8 +96,8 @@ try {
   });
   const firstJob = (await state())[0];
   const windowId = firstJob.windowId;
-  const panel = await edge.page('chrome-extension://' + edge.extensionId + '/panel/stable.html');
-  const ui = (code) => edge.evaluate(panel.sessionId, code);
+  const panel = await browser.page('chrome-extension://' + browser.extensionId + '/panel/stable.html');
+  const ui = (code) => browser.evaluate(panel.sessionId, code);
   const runtime = (message) => ui('chrome.runtime.sendMessage(' + JSON.stringify({ ...message, windowId }) + ')');
   await check('侧栏显示成功状态、任务记录和完整文本；禁用成功任务重试', async () => {
     await until(async () => (await ui('document.querySelector("#status").textContent')) === '已发送');
@@ -110,7 +110,7 @@ try {
     await sleep(300);
     await until(async () => (await sw(`chrome.tabs.get(${lastTabId})`)).status === 'complete');
     await until(async () => {
-      try { return await sw(`chrome.tabs.sendMessage(${lastTabId},{type:'delivery-v3-ping'},{frameId:0}).then(r=>r.version==='0.3.2')`); } catch { return false; }
+      try { return await sw(`chrome.tabs.sendMessage(${lastTabId},{type:'delivery-v3-ping'},{frameId:0}).then(r=>r.version==='0.4.0')`); } catch { return false; }
     });
   }
   async function deliver(text, autoSend = true, id = crypto.randomUUID()) {
@@ -131,13 +131,13 @@ try {
     await target('normal'); const id=crypto.randomUUID();
     const result=await deliver('第一行\n第二行 <>&🙂\n\n末行',true,id);
     if (!result.sent) {
-      const t=[...edge.sessions.values()].find((item)=>item.type==='page' && item.url.startsWith('https://chatgpt.com'));
-      console.log('多行编辑器：',await edge.evaluate(t.sessionId,'({text:document.querySelector("#prompt-textarea").innerText,html:document.querySelector("#prompt-textarea").innerHTML})'));
+      const t=[...browser.sessions.values()].find((item)=>item.type==='page' && item.url.startsWith('https://chatgpt.com'));
+      console.log('多行编辑器：',await browser.evaluate(t.sessionId,'({text:document.querySelector("#prompt-textarea").innerText,html:document.querySelector("#prompt-textarea").innerHTML})'));
     }
     assert.equal(result.sent,true,JSON.stringify(result));
     const repeated=await deliver('第一行\n第二行 <>&🙂\n\n末行',true,id); assert.equal(repeated.sent,true);
-    const tab=await until(()=>[...edge.sessions.values()].find((item)=>item.type==='page' && item.url.startsWith('https://chatgpt.com')));
-    assert.equal((await edge.evaluate(tab.sessionId,'window.sent')).length,1);
+    const tab=await until(()=>[...browser.sessions.values()].find((item)=>item.type==='page' && item.url.startsWith('https://chatgpt.com')));
+    assert.equal((await browser.evaluate(tab.sessionId,'window.sent')).length,1);
   });
   await check('textarea 编辑器与关闭自动发送', async () => { await target('textarea'); const result=await deliver('textarea 内容',false); assert.equal(result.filled,true); assert.equal(result.sent,false); });
   await check('发送按钮延迟出现时等待并提交', async () => { await target('lazy-button'); assert.equal((await deliver('按钮延迟')).sent,true); });
@@ -156,10 +156,22 @@ try {
     await until(async () => (await sw('chrome.sidePanel.getOptions({})')).path === 'panel/panel.html');
     assert.deepEqual((await sw('chrome.declarativeNetRequest.getEnabledRulesets()')).sort(),['headers','site']);
     assert.equal((await sw('chrome.sidePanel.getOptions({})')).path,'panel/panel.html');
-    const legacy=await until(()=>[...edge.sessions.values()].find((item)=>item.type==='page' && item.url.endsWith('/panel/panel.html')));
-    await until(async()=>(await edge.evaluate(legacy.sessionId,'document.querySelector("#status-text")?.textContent || ""')).includes('已连接'),12000);
+    const embeddedPanels=()=>[...browser.sessions.values()].filter((item)=>item.type==='page' && item.url.endsWith('/panel/panel.html'));
+    await until(async()=>{
+      for(const item of embeddedPanels()){
+        const status=await browser.evaluate(item.sessionId,'document.querySelector("#status-text")?.textContent || ""').catch(()=>"");
+        if(status.includes('已连接'))return true;
+      }
+      return false;
+    },12000);
     await runtime({ type:'send-to-panel', text:'实验侧栏消息', source:'test' });
-    await until(async()=>(await edge.evaluate(legacy.sessionId,'document.querySelector("#status-text").textContent')).startsWith('已发送'),12000);
+    await until(async()=>{
+      for(const item of embeddedPanels()){
+        const status=await browser.evaluate(item.sessionId,'document.querySelector("#status-text")?.textContent || ""').catch(()=>"");
+        if(status.startsWith('已发送'))return true;
+      }
+      return false;
+    },12000);
     const popup=await runtime({ type:'open-compat' });
     assert(popup.ok,JSON.stringify(popup));
     const delivered=await runtime({ type:'send-to-compat',text:'贴边窗口消息',autoSend:true,requestId:crypto.randomUUID() });
@@ -170,8 +182,8 @@ try {
     assert.equal((await sw('chrome.sidePanel.getOptions({})')).path,'panel/stable.html');
   });
   if (hasScreenshot) {
-    await edge.send('Emulation.setDeviceMetricsOverride',{width:390,height:850,deviceScaleFactor:1,mobile:false},panel.sessionId);
-    const shot=await edge.send('Page.captureScreenshot',{format:'png'},panel.sessionId);
+    await browser.send('Emulation.setDeviceMetricsOverride',{width:390,height:850,deviceScaleFactor:1,mobile:false},panel.sessionId);
+    const shot=await browser.send('Page.captureScreenshot',{format:'png'},panel.sessionId);
     writeFileSync(screenshot,Buffer.from(shot.data,'base64'));
   }
   await check('新会话初始化恢复内嵌，保留用户偏好，不自动重发文本', async () => {
@@ -182,13 +194,13 @@ try {
     assert.equal((await sw('chrome.storage.sync.get("autoSend")')).autoSend,false);
     assert.equal((await sw('chrome.storage.session.get("pendingPrompt")')).pendingPrompt,undefined);
   });
-  await check('页面与后台没有未处理异常', async () => { assert.deepEqual(edge.errors,[]); });
-  console.log('Edge 完整链路：' + passed + ' 项通过');
+  await check('页面与后台没有未处理异常', async () => { assert.deepEqual(browser.errors,[]); });
+  console.log(browser.browserName + ' 完整链路：' + passed + ' 项通过');
 } catch (error) {
-  if (edge) {
-    console.log('诊断：', await edge.evaluate(edge.worker.sessionId, 'chrome.storage.session.get(null)').catch(String));
-    console.log('目标：', (await edge.send('Target.getTargets')).targetInfos.map(({type,url})=>({type,url})));
-    console.log('异常：', edge.errors);
+  if (browser) {
+    console.log('诊断：', await browser.evaluate(browser.worker.sessionId, 'chrome.storage.session.get(null)').catch(String));
+    console.log('目标：', (await browser.send('Target.getTargets')).targetInfos.map(({type,url})=>({type,url})));
+    console.log('异常：', browser.errors);
   }
   throw error;
-} finally { await edge?.close(); await new Promise((resolve)=>server.close(resolve)); }
+} finally { await browser?.close(); await new Promise((resolve)=>server.close(resolve)); }

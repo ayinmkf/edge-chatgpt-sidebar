@@ -1,10 +1,10 @@
-# ChatGPT Sidebar for Microsoft Edge
+# ChatGPT Sidebar for Edge and Chrome
 
 [简体中文](README.md) | **English** | [Share page](https://ayinmkf.github.io/edge-chatgpt-sidebar/)
 
-Send text selected on a web page to ChatGPT while you browse. Use it to explain concepts, translate passages, summarize excerpts, or support your reading. The extension opens ChatGPT inside the Edge sidebar by default and also offers a stable delivery mode that uses a regular ChatGPT tab.
+Send text selected on a web page to ChatGPT while you browse. Use it to explain concepts, translate passages, summarize excerpts, or support your reading. The extension opens ChatGPT inside the Edge or Chrome side panel by default and also offers a stable delivery mode that uses a regular ChatGPT tab.
 
-Current version: **v0.3.2**. This is an unofficial project, not affiliated with or endorsed by OpenAI or Microsoft.
+Current version: **v0.4.0**. This is an unofficial project, not affiliated with or endorsed by OpenAI, Microsoft, or Google.
 
 For X/Twitter, paste the complete project-page URL: `https://ayinmkf.github.io/edge-chatgpt-sidebar/`.
 
@@ -39,31 +39,41 @@ This is not a whole-page scraper. It does not automatically read the entire arti
 
 ## 2. Before you start
 
-- A computer running a recent version of Microsoft Edge. Development and testing primarily target Windows.
+- A computer running Microsoft Edge or Google Chrome. Chrome 116 or later is required; Edge must support the Side Panel API. Development and testing primarily target Windows.
 - Working access to [ChatGPT](https://chatgpt.com/), with any login or verification required by the website completed.
 - The extension uses the ChatGPT website. You do not need an API key or an API subscription. Available website features, usage limits, and subscriptions are determined by ChatGPT.
 - **Regular users do not need Node.js, Git, or a command line.** Those tools are only needed for development, testing, or source control.
 
 First confirm that ChatGPT works in a normal browser tab. Installing this extension will not resolve a network or account access problem.
 
+### Browser compatibility
+
+| Browser | Status | Notes |
+| --- | --- | --- |
+| Microsoft Edge | Supported | Automated acceptance completed on Edge 152 |
+| Google Chrome | Supported | The same suite passed on Chrome for Testing 153 |
+| Brave / Vivaldi / Opera | Likely compatible, not fully verified | Chromium-based, but side-panel behavior and browser policies may differ |
+| Firefox | Not currently supported | Uses the incompatible `sidebar_action/sidebarAction` API |
+| Safari | Not currently supported | Requires separate conversion, signing, and sidebar integration |
+
 ## 3. Download and install
 
 Install this project as an unpacked extension. These instructions do not use a browser extension store. Regular users should download the package from the [latest Release](https://github.com/ayinmkf/edge-chatgpt-sidebar/releases/latest).
 
-1. Open the [latest Release](https://github.com/ayinmkf/edge-chatgpt-sidebar/releases/latest). Under **Assets**, download `edge-chatgpt-sidebar-v0.3.2.zip`. Do not choose GitHub's automatically generated Source code archives.
+1. Open the [latest Release](https://github.com/ayinmkf/edge-chatgpt-sidebar/releases/latest). Under **Assets**, download `chatgpt-sidebar-edge-chrome-v0.4.0.zip`. Do not choose GitHub's automatically generated Source code archives.
 2. Right-click the downloaded ZIP and choose **Extract All**. Extract it to a folder you intend to keep.
 3. Open the extracted folder and find the directory that directly contains `manifest.json`. You should also see folders such as `background`, `content`, and `panel`.
-4. Enter `edge://extensions/` in the Edge address bar and press Enter.
+4. Open the extension manager: use `edge://extensions/` in Edge or `chrome://extensions/` in Chrome.
 5. Turn on **Developer mode**.
 6. Click **Load unpacked**.
 7. Select the directory from step 3. Do not select the ZIP file, the `panel` subfolder, or an extra outer directory.
 8. Confirm that **ChatGPT 侧边栏** appears in the extension list and is enabled.
-9. Open the Extensions menu on the Edge toolbar and choose to show this extension on the toolbar. Depending on your Edge version, the control may use a pin or eye icon.
+9. Open the Extensions menu on the browser toolbar and pin this extension. Depending on the browser version, the control may use a pin or eye icon.
 10. Refresh the web page you want to select text from, then click the extension icon to open the sidebar.
 
-Do not move or delete the installed folder: Edge continues to load the extension from it. If you need the source instead, use **Code → Download ZIP** on the repository home page. The source directory can also be loaded directly without building anything.
+Do not move or delete the installed folder: the browser continues to load the extension from it. If you need the source instead, use **Code → Download ZIP** on the repository home page. The source directory can also be loaded directly without building anything.
 
-If you receive an `edge-chatgpt-sidebar.zip` generated by this project, extract it and load its directory containing `manifest.json` in the same way. Do not load both copies at once; that can cause duplicate buttons.
+If you receive a universal ZIP generated by this project, extract it and load its directory containing `manifest.json` in the same way. Do not load both copies at once; that can cause duplicate buttons.
 
 ## 4. Send your first selection
 
@@ -76,7 +86,7 @@ If you receive an `edge-chatgpt-sidebar.zip` generated by this project, extract 
 7. Add an instruction such as “Please explain this passage,” review the text, and click ChatGPT's send button.
 8. Confirm that your message appears in the conversation, then wait for a response.
 
-You can also select text, right-click, and choose **发送选中内容到 ChatGPT 侧边栏** (“Send selected content to the ChatGPT sidebar”). `Ctrl+Shift+Y` opens the sidebar; it **does not send the current selection**. You can change the shortcut at `edge://extensions/shortcuts`.
+You can also select text, right-click, and choose **发送选中内容到 ChatGPT 侧边栏** (“Send selected content to the ChatGPT sidebar”). `Ctrl+Shift+Y` opens the sidebar; it **does not send the current selection**. Change it at `edge://extensions/shortcuts` in Edge or `chrome://extensions/shortcuts` in Chrome.
 
 ### Automatic sending and fill-only mode
 
@@ -101,13 +111,13 @@ Click **⋯** at the top of the embedded sidebar. You can change settings withou
 | 高级选项 → UA 伪装 — user-agent override | Off | Tries a different browser identifier for embedded navigation; session only; does not guarantee successful verification |
 | 高级选项 → 自检 / 诊断 — checks / diagnostics | Manual | Inspects embedding rules or the input field to help troubleshoot |
 
-Mode changes last for the current browser session. Background worker suspension or reopening the sidebar does not reset your choice. **Ending the browser session and restarting, reloading the extension, or updating it restores embedded mode.** If Edge keeps running in the background, closing its windows may not end the session.
+Mode changes last for the current browser session. Background worker suspension or reopening the sidebar does not reset your choice. **Ending the browser session and restarting, reloading the extension, or updating it restores embedded mode.** If the browser keeps running in the background, closing its windows may not end the session.
 
 ## 6. Three modes and what to do if embedding fails
 
 | Mode | Where ChatGPT appears | When to use it |
 | --- | --- | --- |
-| Embedded sidebar (default) | Inside the Edge sidebar | Reading a page and chatting side by side |
+| Embedded sidebar (default) | Inside the Edge or Chrome side panel | Reading a page and chatting side by side |
 | Stable delivery | A regular ChatGPT tab in the same browser window | Embedding or login fails, or you want a queue and task diagnostics |
 | Standalone window | A separate ChatGPT window | Keeping ChatGPT in its own window next to your reading |
 
@@ -138,7 +148,7 @@ Embedding can be affected by website policies, login state, the browser, and net
 
 ### The selection button does not appear
 
-Confirm that the extension and selection-button setting are enabled, then refresh the source page. Select at least two characters. Edge internal pages, the extension store, and ChatGPT pages themselves do not display this button. For text inside a child frame, try the context menu.
+Confirm that the extension and selection-button setting are enabled, then refresh the source page. Select at least two characters. Browser internal pages, extension stores, and ChatGPT pages themselves do not display this button. For text inside a child frame, try the context menu.
 
 ### Clicking says the extension was updated, or nothing happens
 
@@ -158,13 +168,13 @@ Check the automatic-send setting and handle any existing draft. If the text is a
 
 ### Two buttons or two extension copies appear
 
-At `edge://extensions/`, ensure only one copy of this project is enabled, then refresh the page. Other extensions do not need to stay disabled; investigate a particular extension only if the problem occurs when it is enabled alongside this one.
+At `edge://extensions/` or `chrome://extensions/`, ensure only one copy of this project is enabled, then refresh the page. Other extensions do not need to stay disabled; investigate a particular extension only if the problem occurs when it is enabled alongside this one.
 
 ### How to update
 
 1. Download and extract the new source ZIP.
 2. Back up any files you changed, then update the files in the original installation directory without adding another outer folder.
-3. Open `edge://extensions/`, locate this extension, and click Reload.
+3. Open `edge://extensions/` in Edge or `chrome://extensions/` in Chrome, locate this extension, and click Reload.
 4. Close and reopen the sidebar, then check the version at the bottom of its settings menu.
 5. **Refresh the source page and any existing ChatGPT tabs** so that the updated page scripts take effect.
 
@@ -172,23 +182,23 @@ At `edge://extensions/`, ensure only one copy of this project is enabled, then r
 
 - After you click Send, the selected text is passed to the ChatGPT website and is subject to that website's data practices. The extension has no additional third-party relay service or telemetry.
 - Delivery text is temporarily stored in the local browser session. It survives background worker suspension but is cleared when the browser session ends or the extension is reloaded. This does not delete chats stored by ChatGPT itself.
-- Preferences use extension storage; some settings may sync when Edge synchronization is enabled.
+- Preferences use extension storage; some settings may sync when browser extension synchronization is enabled.
 - Website access is used for the selection button and interaction with the ChatGPT composer. Sidebar, tabs, script injection, context menus, and alarms permissions support those features and queue recovery.
 - Embedded mode enables response-header modification rules to support iframe loading. Stable mode disables those embedding rules.
 - Temporary incognito-like mode only changes Cookie / Authorization handling for embedded navigation. **It is not a fully isolated private browsing environment.**
-- **退出登录 ChatGPT（清除 Cookie）** (“Sign out of ChatGPT / clear cookies”) affects other ChatGPT tabs in the same Edge profile. It asks for confirmation before proceeding.
+- **退出登录 ChatGPT（清除 Cookie）** (“Sign out of ChatGPT / clear cookies”) affects other ChatGPT tabs in the current browser profile. It asks for confirmation before proceeding.
 - Diagnostics may contain selected-text fragments or page information. Review them and remove conversation text, account details, and sensitive information before posting a public Issue.
 
 ## 9. Development, testing, and packaging
 
 This section is for developers. Regular users do not need to run these commands.
 
-The project uses Manifest V3, has no runtime dependencies, and requires no compilation. Tests require Node.js 22+ and Microsoft Edge. Set `EDGE_PATH` to use a specific browser executable.
+The project uses Manifest V3, has no runtime dependencies, and requires no compilation. Development tests require Node.js 22+. `npm install` installs development-only Puppeteer and Chrome for Testing. Set `BROWSER_PATH` to use a specific Edge or testing Chrome executable; the legacy `EDGE_PATH` remains supported.
 
 ```powershell
-node tools/verify-queue.mjs
-node tools/verify-stable.mjs
-node tools/verify-fab.mjs
+npm install
+npm run test:logic
+npm run test:browsers
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/package.ps1
 ```
 
@@ -198,8 +208,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/package.ps1
 - `rules/`: embedding rules.
 - `tools/`: tests, icon tools, installation helper, and packaging script.
 
-End-to-end automation uses an isolated temporary Edge profile and **local mock ChatGPT pages**, not a real account. It cannot replace real-site checks of login, verification, and embedding.
+End-to-end automation uses isolated temporary Edge and Chrome for Testing profiles with **local mock ChatGPT pages**, not a real account. It cannot replace real-site checks of login, verification, and embedding.
 
 Use `node tools/verify-stable.mjs --screenshot artifacts/panel.png` to save test screenshots inside the project. Browser test profiles use the system temporary directory and are cleaned up on normal completion.
 
-Packaging produces `dist/edge-chatgpt-sidebar.zip` with both language guides and preserves the previous ZIP before replacing it. Git excludes dist, caches, backups, screenshots, and local publishing tools. No open-source license has been specified for this repository.
+Packaging produces `dist/chatgpt-sidebar-edge-chrome-v0.4.0.zip` with both language guides and a root `manifest.json`, plus a SHA-256 checksum. Git excludes dist, caches, backups, screenshots, and local publishing tools. No open-source license has been specified for this repository.

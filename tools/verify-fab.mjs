@@ -14,16 +14,20 @@
 import { spawn } from 'node:child_process';
 import { readFileSync, existsSync, mkdtempSync, rmSync, mkdirSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
-import { join, dirname, resolve } from 'node:path';
+import { join, dirname, resolve, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const EDGE = [
+const BROWSER = [
+  process.env.BROWSER_PATH,
   process.env.EDGE_PATH,
   'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
   'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe'
 ].find((p) => p && existsSync(p));
+if (!BROWSER) throw new Error('未找到测试浏览器，可通过 BROWSER_PATH 指定 Edge 或 Chrome for Testing');
+const BROWSER_PROCESS = basename(BROWSER);
+const BROWSER_NAME = /chrome/i.test(BROWSER_PROCESS) && !/msedge/i.test(BROWSER_PROCESS) ? 'Chrome' : 'Edge';
 
 const PORT = 18202;
 const results = [];
@@ -38,11 +42,11 @@ function check(name, ok, detail) {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /**
- * 结束所有使用指定 profile 目录的 Edge 进程。
+ * 结束所有使用指定 profile 目录的测试浏览器进程。
  * child.kill() 只杀掉启动器，真正的浏览器进程是它派生的，还占着目录，
  * 所以这里按命令行里的 profile 路径精确匹配再杀。
  */
-async function killEdgeFor(dir) {
+async function killBrowserFor(dir) {
   if (process.platform !== 'win32') {
     try {
       child.kill();
@@ -58,7 +62,7 @@ async function killEdgeFor(dir) {
       [
         '-NoProfile',
         '-Command',
-        `Get-CimInstance Win32_Process -Filter "Name='msedge.exe'" | Where-Object { $_.CommandLine -like '*${key}*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }`
+        `Get-CimInstance Win32_Process -Filter "Name='${BROWSER_PROCESS}'" | Where-Object { $_.CommandLine -like '*${key}*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }`
       ],
       { stdio: 'ignore' }
     );
@@ -68,7 +72,7 @@ async function killEdgeFor(dir) {
   await sleep(2500);
 }
 
-/** 尽力删除临时目录（Edge 退出后目录可能被系统短暂占用，重试几次） */
+/** 尽力删除临时目录（浏览器退出后目录可能被系统短暂占用，重试几次） */
 async function cleanupDir(dir) {
   if (!dir) return true;
   for (let i = 0; i < 6; i++) {
@@ -143,11 +147,11 @@ const profile = mkdtempSync(join(tmpdir(), 'cgpt-fab-profile-'));
 let ws = null;
 let child = null;
 try {
-  // Edge 偶尔会被系统瞬时拦一下导致启动失败，这里最多重试 3 次
+  // 浏览器偶尔会被系统瞬时拦一下导致启动失败，这里最多重试 3 次
   let version = null;
   for (let attempt = 1; attempt <= 3 && !version; attempt++) {
     child = spawn(
-      EDGE,
+      BROWSER,
       [
         '--headless=new',
         `--user-data-dir=${profile}`,
@@ -172,7 +176,7 @@ try {
       if (!version) await sleep(120);
     }
     if (!version) {
-      console.log(`第 ${attempt} 次启动 Edge 失败，重试…`);
+      console.log(`第 ${attempt} 次启动 ${BROWSER_NAME} 失败，重试…`);
       try {
         child.kill();
       } catch (err) {
@@ -181,7 +185,7 @@ try {
       await sleep(1500);
     }
   }
-  if (!version) throw new Error('Edge 启动失败（已重试 3 次）');
+  if (!version) throw new Error(`${BROWSER_NAME} 启动失败（已重试 3 次）`);
 
   ws = new WebSocket(version.webSocketDebuggerUrl);
   await new Promise((r, j) => {
@@ -449,7 +453,7 @@ try {
   }
   child.kill();
   server.close();
-  await killEdgeFor(profile);
+  await killBrowserFor(profile);
   const ok1 = await cleanupDir(profile);
   const ok2 = await cleanupDir(tempRoot);
   if (!ok1 || !ok2) {

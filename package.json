@@ -1,0 +1,16 @@
+{
+  "name": "edge-chrome-chatgpt-sidebar",
+  "private": true,
+  "version": "0.4.0",
+  "description": "Development-only browser compatibility tests for the Edge and Chrome extension.",
+  "type": "module",
+  "scripts": {
+    "test:logic": "node tools/verify-queue.mjs && node tools/verify-send.mjs",
+    "test:edge": "node tools/verify-stable.mjs",
+    "test:chrome-load": "node tools/verify-chrome-load.mjs",
+    "test:browsers": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/verify-browsers.ps1"
+  },
+  "devDependencies": {
+    "puppeteer": "25.11.0"
+  }
+}
